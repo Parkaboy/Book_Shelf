@@ -12,11 +12,23 @@ namespace Book_Shelf.Data;
 
 public sealed class LibrarySyncService
 {
+    private readonly Func<LibraryDbContext> contextFactory;
+
     private static readonly HashSet<string> SupportedExtensions = new(StringComparer.OrdinalIgnoreCase)
     {
         ".epub",
         ".pdf"
     };
+
+    public LibrarySyncService()
+        : this(LibraryDbContext.Create)
+    {
+    }
+
+    public LibrarySyncService(Func<LibraryDbContext> contextFactory)
+    {
+        this.contextFactory = contextFactory;
+    }
 
     public async Task<int> SynchronizeAsync(string folderPath, CancellationToken cancellationToken = default)
     {
@@ -31,7 +43,7 @@ public sealed class LibrarySyncService
             .Select(Path.GetFullPath)
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-        await using var database = LibraryDbContext.Create();
+        await using var database = contextFactory();
         await database.Database.EnsureCreatedAsync(cancellationToken);
 
         var folderPrefix = fullFolderPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
@@ -100,7 +112,7 @@ public sealed class LibrarySyncService
 
     public async Task<IReadOnlyList<Book>> SearchAsync(string? searchText = null, CancellationToken cancellationToken = default)
     {
-        await using var database = LibraryDbContext.Create();
+        await using var database = contextFactory();
         var query = database.Books.AsNoTracking();
 
         if (!string.IsNullOrWhiteSpace(searchText))
@@ -112,6 +124,18 @@ public sealed class LibrarySyncService
         }
 
         return await query.OrderBy(book => book.Title).ToListAsync(cancellationToken);
+    }
+
+    public async Task SaveBookAsync(Book editedBook, CancellationToken cancellationToken = default)
+    {
+        await using var database = contextFactory();
+        var book = await database.Books.SingleAsync(candidate => candidate.Id == editedBook.Id, cancellationToken);
+        book.Title = editedBook.Title;
+        book.Author = editedBook.Author;
+        book.Isbn = editedBook.Isbn;
+        book.PageCount = editedBook.PageCount;
+        book.UpdatedUtc = DateTime.UtcNow;
+        await database.SaveChangesAsync(cancellationToken);
     }
 
     private static async Task<string> ComputeHashAsync(string filePath, CancellationToken cancellationToken)

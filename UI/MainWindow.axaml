@@ -1,0 +1,124 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:Book_Shelf.UI"
+        xmlns:models="using:Book_Shelf.Models"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="Book_Shelf.MainWindow"
+        x:DataType="vm:LibraryViewModel"
+        Title="Book Shelf"
+        MinWidth="900"
+        MinHeight="600">
+    <Window.Styles>
+        <Style Selector="Border.book-card">
+            <Setter Property="Background" Value="#FFFFFF" />
+            <Setter Property="BorderBrush" Value="#E3E0DA" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="12" />
+            <Setter Property="Margin" Value="0,0,16,16" />
+            <Setter Property="Focusable" Value="True" />
+            <Setter Property="RenderTransform" Value="scale(1)" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.12" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Border.book-card:focus">
+            <Setter Property="RenderTransform" Value="scale(1.03)" />
+            <Setter Property="BoxShadow" Value="0 8 20 0 #28000000" />
+        </Style>
+        <Style Selector="Border.book-card[Tag=true]">
+            <Setter Property="BorderBrush" Value="#E2A93B" />
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="BoxShadow" Value="0 0 18 3 #55E2A93B" />
+        </Style>
+        <Style Selector="Border.cover">
+            <Setter Property="Background" Value="#284B63" />
+            <Setter Property="CornerRadius" Value="5" />
+        </Style>
+        <Style Selector="TextBlock.label">
+            <Setter Property="Foreground" Value="#756F66" />
+            <Setter Property="FontSize" Value="12" />
+        </Style>
+    </Window.Styles>
+
+    <DockPanel Background="#F5F2ED">
+        <Menu DockPanel.Dock="Top" Background="#FFFFFF">
+            <MenuItem Header="Library">
+                <MenuItem Header="Choose library folder..." Click="ChooseFolder_OnClick" />
+                <MenuItem Header="Rescan library" Click="Rescan_OnClick" />
+                <Separator />
+                <MenuItem Header="Exit" Click="Exit_OnClick" />
+            </MenuItem>
+            <MenuItem Header="View">
+                <MenuItem Header="Refresh books" Click="Rescan_OnClick" />
+            </MenuItem>
+            <MenuItem Header="Help">
+                <MenuItem Header="About Book Shelf" />
+            </MenuItem>
+        </Menu>
+
+        <Grid RowDefinitions="Auto,*" Margin="28,24,28,0">
+            <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,24">
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Your library" FontSize="30" FontWeight="SemiBold" Foreground="#263238" />
+                    <TextBlock Text="{Binding LibraryFolder}" Classes="label" />
+                </StackPanel>
+                <TextBox Grid.Column="1"
+                         Width="260"
+                         VerticalAlignment="Center"
+                         PlaceholderText="Search title, author or ISBN"
+                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+            </Grid>
+
+            <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Text="{Binding StatusMessage}" Classes="label" Margin="0,0,0,16" />
+                    <ItemsControl ItemsSource="{Binding Books}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="models:Book">
+                                <Border Classes="book-card"
+                                        Width="260"
+                                        Tag="{Binding IsSelected}"
+                                        PointerPressed="BookCard_PointerPressed"
+                                        DoubleTapped="BookCard_DoubleTapped">
+                                    <StackPanel Spacing="10">
+                                        <Border Classes="cover" Height="320">
+                                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="18" Spacing="10">
+                                                <TextBlock Text="BOOK" Foreground="#DCE7EC" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center" />
+                                                <TextBlock Text="{Binding Title}" Foreground="White" FontSize="20" FontWeight="SemiBold" TextWrapping="Wrap" TextAlignment="Center" MaxHeight="100" />
+                                                <TextBlock Text="{Binding Author}" Foreground="#DCE7EC" FontSize="12" TextWrapping="Wrap" TextAlignment="Center" />
+                                            </StackPanel>
+                                        </Border>
+                                        <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="SemiBold" Foreground="#263238" TextWrapping="Wrap" MaxHeight="48" />
+                                        <TextBlock Text="{Binding Author}" Classes="label" TextWrapping="Wrap" />
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <TextBlock Text="{Binding Format}" Classes="label" />
+                                            <TextBlock Grid.Column="1" Text="{Binding PageCount, StringFormat='{}{0} pages'}" Classes="label" />
+                                        </Grid>
+                                        <Button Content="Edit details" Click="EditBook_OnClick" HorizontalAlignment="Left" />
+                                        <StackPanel IsVisible="{Binding IsEditing}" Spacing="6">
+                                            <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Title" />
+                                            <TextBox Text="{Binding Author, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Author" />
+                                            <TextBox Text="{Binding Isbn, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="ISBN" />
+                                            <TextBox Text="{Binding PageCount, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Pages" />
+                                            <Button Content="Save" Click="SaveBook_OnClick" HorizontalAlignment="Left" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </DockPanel>
+</Window>
