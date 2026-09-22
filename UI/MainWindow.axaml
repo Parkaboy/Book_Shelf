@@ -18,6 +18,22 @@
             <Setter Property="CornerRadius" Value="8" />
             <Setter Property="Padding" Value="12" />
             <Setter Property="Margin" Value="0,0,16,16" />
+            <Setter Property="Focusable" Value="True" />
+            <Setter Property="RenderTransform" Value="scale(1)" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.12" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Border.book-card:focus">
+            <Setter Property="RenderTransform" Value="scale(1.03)" />
+            <Setter Property="BoxShadow" Value="0 8 20 0 #28000000" />
+        </Style>
+        <Style Selector="Border.book-card[Tag=true]">
+            <Setter Property="BorderBrush" Value="#E2A93B" />
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="BoxShadow" Value="0 0 18 3 #55E2A93B" />
         </Style>
         <Style Selector="Border.cover">
             <Setter Property="Background" Value="#284B63" />
@@ -69,9 +85,13 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate x:DataType="models:Book">
-                                <Border Classes="book-card" Width="210" DoubleTapped="BookCard_DoubleTapped">
+                                <Border Classes="book-card"
+                                        Width="260"
+                                        Tag="{Binding IsSelected}"
+                                        PointerPressed="BookCard_PointerPressed"
+                                        DoubleTapped="BookCard_DoubleTapped">
                                     <StackPanel Spacing="10">
-                                        <Border Classes="cover" Height="250">
+                                        <Border Classes="cover" Height="320">
                                             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="18" Spacing="10">
                                                 <TextBlock Text="BOOK" Foreground="#DCE7EC" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center" />
                                                 <TextBlock Text="{Binding Title}" Foreground="White" FontSize="20" FontWeight="SemiBold" TextWrapping="Wrap" TextAlignment="Center" MaxHeight="100" />
@@ -84,6 +104,14 @@
                                             <TextBlock Text="{Binding Format}" Classes="label" />
                                             <TextBlock Grid.Column="1" Text="{Binding PageCount, StringFormat='{}{0} pages'}" Classes="label" />
                                         </Grid>
+                                        <Button Content="Edit details" Click="EditBook_OnClick" HorizontalAlignment="Left" />
+                                        <StackPanel IsVisible="{Binding IsEditing}" Spacing="6">
+                                            <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Title" />
+                                            <TextBox Text="{Binding Author, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Author" />
+                                            <TextBox Text="{Binding Isbn, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="ISBN" />
+                                            <TextBox Text="{Binding PageCount, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Pages" />
+                                            <Button Content="Save" Click="SaveBook_OnClick" HorizontalAlignment="Left" />
+                                        </StackPanel>
                                     </StackPanel>
                                 </Border>
                             </DataTemplate>

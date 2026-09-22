@@ -59,6 +59,31 @@ public partial class MainWindow : Window
         });
     }
 
+    private void BookCard_PointerPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
+    {
+        if (sender is Control card && card.DataContext is Book book)
+        {
+            card.Focus();
+            viewModel.SelectBook(book);
+        }
+    }
+
+    private void EditBook_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Control { DataContext: Book book })
+        {
+            viewModel.BeginEditing(book);
+        }
+    }
+
+    private async void SaveBook_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Control { DataContext: Book book })
+        {
+            await viewModel.SaveBookAsync(book);
+        }
+    }
+
     private void Exit_OnClick(object? sender, RoutedEventArgs e)
     {
         Close();

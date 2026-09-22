@@ -106,6 +106,26 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
         }
     }
 
+    public void BeginEditing(Book book)
+    {
+        book.IsEditing = true;
+    }
+
+    public void SelectBook(Book selectedBook)
+    {
+        foreach (var book in Books)
+        {
+            book.IsSelected = ReferenceEquals(book, selectedBook);
+        }
+    }
+
+    public async Task SaveBookAsync(Book book)
+    {
+        await syncService.SaveBookAsync(book);
+        book.IsEditing = false;
+        StatusMessage = $"Updated {book.Title}.";
+    }
+
     private async Task LoadBooksAsync()
     {
         var books = await syncService.SearchAsync(SearchText);

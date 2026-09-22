@@ -126,6 +126,18 @@ public sealed class LibrarySyncService
         return await query.OrderBy(book => book.Title).ToListAsync(cancellationToken);
     }
 
+    public async Task SaveBookAsync(Book editedBook, CancellationToken cancellationToken = default)
+    {
+        await using var database = contextFactory();
+        var book = await database.Books.SingleAsync(candidate => candidate.Id == editedBook.Id, cancellationToken);
+        book.Title = editedBook.Title;
+        book.Author = editedBook.Author;
+        book.Isbn = editedBook.Isbn;
+        book.PageCount = editedBook.PageCount;
+        book.UpdatedUtc = DateTime.UtcNow;
+        await database.SaveChangesAsync(cancellationToken);
+    }
+
     private static async Task<string> ComputeHashAsync(string filePath, CancellationToken cancellationToken)
     {
         await using var stream = File.OpenRead(filePath);
