@@ -42,6 +42,7 @@ public sealed class LibraryDbContext : DbContext
             entity.Property(book => book.FilePath).HasMaxLength(4096).IsRequired();
             entity.Property(book => book.Format).HasMaxLength(16).IsRequired();
             entity.Property(book => book.ContentHash).HasMaxLength(64).IsRequired();
+            entity.Property(book => book.CoverPath).HasMaxLength(4096);
             entity.HasIndex(book => book.FilePath).IsUnique();
             entity.HasIndex(book => book.ContentHash);
         });

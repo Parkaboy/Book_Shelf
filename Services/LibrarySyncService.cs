@@ -5,14 +5,16 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
+using Book_Shelf.Data;
 using Book_Shelf.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Book_Shelf.Data;
+namespace Book_Shelf.Services;
 
 public sealed class LibrarySyncService
 {
     private readonly Func<LibraryDbContext> contextFactory;
+    private readonly BookCoverService coverService;
 
     private static readonly HashSet<string> SupportedExtensions = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -26,8 +28,14 @@ public sealed class LibrarySyncService
     }
 
     public LibrarySyncService(Func<LibraryDbContext> contextFactory)
+        : this(contextFactory, new BookCoverService())
+    {
+    }
+
+    public LibrarySyncService(Func<LibraryDbContext> contextFactory, BookCoverService coverService)
     {
         this.contextFactory = contextFactory;
+        this.coverService = coverService;
     }
 
     public async Task<int> SynchronizeAsync(string folderPath, CancellationToken cancellationToken = default)
@@ -44,7 +52,7 @@ public sealed class LibrarySyncService
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         await using var database = contextFactory();
-        await database.Database.EnsureCreatedAsync(cancellationToken);
+        await database.Database.MigrateAsync(cancellationToken);
 
         var folderPrefix = fullFolderPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
             + Path.DirectorySeparatorChar;
@@ -87,17 +95,21 @@ public sealed class LibrarySyncService
             }
             else
             {
+                coverService.Delete(book.CoverPath);
                 book.FileSize = fileInfo.Length;
                 book.FileLastModifiedUtc = lastModifiedUtc;
                 book.ContentHash = contentHash;
                 book.UpdatedUtc = now;
             }
 
+            book.CoverPath = await coverService.ResolveAsync(book, cancellationToken);
+
             changedBooks++;
         }
 
         foreach (var book in existingBooks.Where(book => !files.Contains(book.FilePath)))
         {
+            coverService.Delete(book.CoverPath);
             database.Books.Remove(book);
             changedBooks++;
         }
@@ -134,8 +146,15 @@ public sealed class LibrarySyncService
         book.Author = editedBook.Author;
         book.Isbn = editedBook.Isbn;
         book.PageCount = editedBook.PageCount;
+        var previousCoverPath = book.CoverPath;
+        book.CoverPath = await coverService.ResolveAsync(book, cancellationToken);
+        if (!string.Equals(previousCoverPath, book.CoverPath, StringComparison.OrdinalIgnoreCase))
+        {
+            coverService.Delete(previousCoverPath);
+        }
         book.UpdatedUtc = DateTime.UtcNow;
         await database.SaveChangesAsync(cancellationToken);
+        editedBook.CoverPath = book.CoverPath;
     }
 
     private static async Task<string> ComputeHashAsync(string filePath, CancellationToken cancellationToken)

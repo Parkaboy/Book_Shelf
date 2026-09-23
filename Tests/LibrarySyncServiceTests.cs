@@ -1,7 +1,12 @@
 using System;
 using System.IO;
+using System.Net;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Book_Shelf.Data;
+using Book_Shelf.Models;
+using Book_Shelf.Services;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
@@ -51,6 +56,44 @@ public sealed class LibrarySyncServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task SynchronizeAsync_CachesMatchingLocalCover()
+    {
+        var bookPath = Path.Combine(libraryFolder, "Dune.pdf");
+        var coverPath = Path.Combine(libraryFolder, "Dune.jpg");
+        await File.WriteAllTextAsync(bookPath, "pdf content");
+        await File.WriteAllTextAsync(coverPath, "cover content");
+        var service = CreateService();
+
+        await service.SynchronizeAsync(libraryFolder);
+        var book = Assert.Single(await service.SearchAsync());
+
+        Assert.NotNull(book.CoverPath);
+        Assert.True(File.Exists(book.CoverPath));
+        Assert.Equal("cover content", await File.ReadAllTextAsync(book.CoverPath));
+        Assert.NotEqual(coverPath, book.CoverPath);
+    }
+
+    [Fact]
+    public async Task SynchronizeAsync_UsesGoogleBooksCoverByIsbn()
+    {
+        var bookPath = Path.Combine(libraryFolder, "Dune.pdf");
+        await File.WriteAllTextAsync(bookPath, "pdf content");
+        var handler = new GoogleBooksHandler();
+        var service = CreateService(handler);
+
+        await service.SynchronizeAsync(libraryFolder);
+        var book = Assert.Single(await service.SearchAsync());
+        book.Isbn = "978-0-441-17271-9";
+        await service.SaveBookAsync(book);
+
+        Assert.NotNull(book.CoverPath);
+        Assert.True(File.Exists(book.CoverPath));
+        Assert.Equal("fake image", await File.ReadAllTextAsync(book.CoverPath));
+        Assert.Contains("isbn", handler.LastRequestUri);
+        Assert.Contains("9780441172719", handler.LastRequestUri);
+    }
+
+    [Fact]
     public async Task SynchronizeAsync_RemovesBooksDeletedFromFolder()
     {
         var bookPath = Path.Combine(libraryFolder, "To remove.epub");
@@ -73,14 +116,45 @@ public sealed class LibrarySyncServiceTests : IDisposable
         }
     }
 
-    private LibrarySyncService CreateService()
+    private LibrarySyncService CreateService(HttpMessageHandler? handler = null)
     {
+        handler ??= new GoogleBooksHandler();
         return new LibrarySyncService(() =>
         {
             var options = new DbContextOptionsBuilder<LibraryDbContext>()
                 .UseSqlite($"Data Source={databasePath};Pooling=False")
                 .Options;
             return new LibraryDbContext(options);
-        });
+        }, new BookCoverService(
+            Path.Combine(testRoot, "covers"),
+            new HttpClient(handler)));
+    }
+
+    private sealed class GoogleBooksHandler : HttpMessageHandler
+    {
+        public string? LastRequestUri { get; private set; }
+
+        protected override Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            System.Threading.CancellationToken cancellationToken)
+        {
+            if (request.RequestUri?.AbsolutePath.EndsWith("/volumes", StringComparison.Ordinal) == true)
+            {
+                LastRequestUri = request.RequestUri.ToString();
+                var response = new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new StringContent(
+                    "{\"items\":[{\"volumeInfo\":{\"imageLinks\":{\"thumbnail\":\"https://books.google.test/cover.jpg\"}}}]}",
+                    Encoding.UTF8,
+                    "application/json")
+                };
+                return Task.FromResult(response);
+            }
+
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("fake image", Encoding.UTF8, "image/jpeg")
+            });
+        }
     }
 }
