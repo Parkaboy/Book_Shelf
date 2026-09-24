@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using Book_Shelf.Models;
+using Book_Shelf.Resources;
 using Book_Shelf.UI;
 
 namespace Book_Shelf;
@@ -31,7 +32,7 @@ public partial class MainWindow : Window
         var folders = await StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
         {
             AllowMultiple = false,
-            Title = "Choose your book library"
+            Title = Strings.ChooseYourBookLibrary
         });
 
         if (folders.Count > 0 && folders[0].TryGetLocalPath() is string folderPath)

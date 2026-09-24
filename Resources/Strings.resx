@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="AboutBookShelf" xml:space="preserve"><value>About Book Shelf</value></data>
+  <data name="Author" xml:space="preserve"><value>Author</value></data>
+  <data name="Book" xml:space="preserve"><value>BOOK</value></data>
+  <data name="ChooseExistingLibraryFolderFirst" xml:space="preserve"><value>Choose an existing library folder first.</value></data>
+  <data name="ChooseLibraryFolder" xml:space="preserve"><value>Choose library folder...</value></data>
+  <data name="ChooseYourBookLibrary" xml:space="preserve"><value>Choose your book library</value></data>
+  <data name="ChooseLibraryFolderToBegin" xml:space="preserve"><value>Choose a library folder to begin.</value></data>
+  <data name="EditDetails" xml:space="preserve"><value>Edit details</value></data>
+  <data name="Exit" xml:space="preserve"><value>Exit</value></data>
+  <data name="Isbn" xml:space="preserve"><value>ISBN</value></data>
+  <data name="Library" xml:space="preserve"><value>Library</value></data>
+  <data name="LibraryIsUpToDate" xml:space="preserve"><value>Library is up to date.</value></data>
+  <data name="LibraryUpdatedFormat" xml:space="preserve"><value>Library updated: {0} change(s).</value></data>
+  <data name="NoLibraryFolderSelected" xml:space="preserve"><value>No library folder selected</value></data>
+  <data name="Pages" xml:space="preserve"><value>Pages</value></data>
+  <data name="PageCountFormat" xml:space="preserve"><value>{0} pages</value></data>
+  <data name="RefreshBooks" xml:space="preserve"><value>Refresh books</value></data>
+  <data name="RescanLibrary" xml:space="preserve"><value>Rescan library</value></data>
+  <data name="Save" xml:space="preserve"><value>Save</value></data>
+  <data name="SavedLibraryFolderUnavailable" xml:space="preserve"><value>The saved library folder is no longer available.</value></data>
+  <data name="ScanningLibrary" xml:space="preserve"><value>Scanning library...</value></data>
+  <data name="SearchTitleAuthorOrIsbn" xml:space="preserve"><value>Search title, author or ISBN</value></data>
+  <data name="Title" xml:space="preserve"><value>Title</value></data>
+  <data name="UpdatedBookFormat" xml:space="preserve"><value>Updated {0}.</value></data>
+  <data name="View" xml:space="preserve"><value>View</value></data>
+  <data name="Help" xml:space="preserve"><value>Help</value></data>
+  <data name="BookShelf" xml:space="preserve"><value>Book Shelf</value></data>
+  <data name="YourLibrary" xml:space="preserve"><value>Your library</value></data>
+</root>

@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Book_Shelf.Data;
 using Book_Shelf.Models;
+using Book_Shelf.Resources;
 using Book_Shelf.Services;
 
 namespace Book_Shelf.UI;
@@ -14,8 +15,8 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
 {
     private readonly LibrarySyncService syncService = new();
     private string? searchText;
-    private string libraryFolder = "No library folder selected";
-    private string statusMessage = "Choose a library folder to begin.";
+    private string libraryFolder = Strings.NoLibraryFolderSelected;
+    private string statusMessage = Strings.ChooseLibraryFolderToBegin;
     private bool isBusy;
 
     public ObservableCollection<Book> Books { get; } = new();
@@ -70,7 +71,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
         }
         else
         {
-            StatusMessage = "The saved library folder is no longer available.";
+            StatusMessage = Strings.SavedLibraryFolderUnavailable;
             await LoadBooksAsync();
         }
     }
@@ -85,21 +86,21 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
 
     public async Task SynchronizeAsync()
     {
-        if (LibraryFolder == "No library folder selected" || !Directory.Exists(LibraryFolder))
+        if (LibraryFolder == Strings.NoLibraryFolderSelected || !Directory.Exists(LibraryFolder))
         {
-            StatusMessage = "Choose an existing library folder first.";
+            StatusMessage = Strings.ChooseExistingLibraryFolderFirst;
             return;
         }
 
         IsBusy = true;
-        StatusMessage = "Scanning library...";
+        StatusMessage = Strings.ScanningLibrary;
         try
         {
             var changedBooks = await syncService.SynchronizeAsync(LibraryFolder);
             await LoadBooksAsync();
             StatusMessage = changedBooks == 0
-                ? "Library is up to date."
-                : $"Library updated: {changedBooks} change(s).";
+                ? Strings.LibraryIsUpToDate
+                : string.Format(Strings.LibraryUpdatedFormat, changedBooks);
         }
         finally
         {
@@ -124,7 +125,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
     {
         await syncService.SaveBookAsync(book);
         book.IsEditing = false;
-        StatusMessage = $"Updated {book.Title}.";
+        StatusMessage = string.Format(Strings.UpdatedBookFormat, book.Title);
     }
 
     private async Task LoadBooksAsync()

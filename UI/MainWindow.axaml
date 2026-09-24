@@ -4,10 +4,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="using:Book_Shelf.UI"
         xmlns:models="using:Book_Shelf.Models"
+        xmlns:resources="using:Book_Shelf.Resources"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Book_Shelf.MainWindow"
         x:DataType="vm:LibraryViewModel"
-        Title="Book Shelf"
+        Title="{x:Static resources:Strings.BookShelf}"
         MinWidth="900"
         MinHeight="600">
     <Window.Styles>
@@ -47,30 +48,30 @@
 
     <DockPanel Background="#F5F2ED">
         <Menu DockPanel.Dock="Top" Background="#FFFFFF">
-            <MenuItem Header="Library">
-                <MenuItem Header="Choose library folder..." Click="ChooseFolder_OnClick" />
-                <MenuItem Header="Rescan library" Click="Rescan_OnClick" />
+            <MenuItem Header="{x:Static resources:Strings.Library}">
+                <MenuItem Header="{x:Static resources:Strings.ChooseLibraryFolder}" Click="ChooseFolder_OnClick" />
+                <MenuItem Header="{x:Static resources:Strings.RescanLibrary}" Click="Rescan_OnClick" />
                 <Separator />
-                <MenuItem Header="Exit" Click="Exit_OnClick" />
+                <MenuItem Header="{x:Static resources:Strings.Exit}" Click="Exit_OnClick" />
             </MenuItem>
-            <MenuItem Header="View">
-                <MenuItem Header="Refresh books" Click="Rescan_OnClick" />
+            <MenuItem Header="{x:Static resources:Strings.View}">
+                <MenuItem Header="{x:Static resources:Strings.RefreshBooks}" Click="Rescan_OnClick" />
             </MenuItem>
-            <MenuItem Header="Help">
-                <MenuItem Header="About Book Shelf" />
+            <MenuItem Header="{x:Static resources:Strings.Help}">
+                <MenuItem Header="{x:Static resources:Strings.AboutBookShelf}" />
             </MenuItem>
         </Menu>
 
         <Grid RowDefinitions="Auto,*" Margin="28,24,28,0">
             <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,24">
                 <StackPanel Spacing="6">
-                    <TextBlock Text="Your library" FontSize="30" FontWeight="SemiBold" Foreground="#263238" />
+                    <TextBlock Text="{x:Static resources:Strings.YourLibrary}" FontSize="30" FontWeight="SemiBold" Foreground="#263238" />
                     <TextBlock Text="{Binding LibraryFolder}" Classes="label" />
                 </StackPanel>
                 <TextBox Grid.Column="1"
                          Width="260"
                          VerticalAlignment="Center"
-                         PlaceholderText="Search title, author or ISBN"
+                         PlaceholderText="{x:Static resources:Strings.SearchTitleAuthorOrIsbn}"
                          Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
             </Grid>
 
@@ -94,7 +95,7 @@
                                         <Border Classes="cover" Height="320">
                                             <Grid>
                                                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="18" Spacing="10">
-                                                    <TextBlock Text="BOOK" Foreground="#DCE7EC" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center" />
+                                                    <TextBlock Text="{x:Static resources:Strings.Book}" Foreground="#DCE7EC" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center" />
                                                     <TextBlock Text="{Binding Title}" Foreground="White" FontSize="20" FontWeight="SemiBold" TextWrapping="Wrap" TextAlignment="Center" MaxHeight="100" />
                                                     <TextBlock Text="{Binding Author}" Foreground="#DCE7EC" FontSize="12" TextWrapping="Wrap" TextAlignment="Center" />
                                                 </StackPanel>
@@ -105,15 +106,15 @@
                                         <TextBlock Text="{Binding Author}" Classes="label" TextWrapping="Wrap" />
                                         <Grid ColumnDefinitions="*,Auto">
                                             <TextBlock Text="{Binding Format}" Classes="label" />
-                                            <TextBlock Grid.Column="1" Text="{Binding PageCount, StringFormat='{}{0} pages'}" Classes="label" />
+                                            <TextBlock Grid.Column="1" Text="{Binding PageCount, StringFormat={x:Static resources:Strings.PageCountFormat}}" Classes="label" />
                                         </Grid>
-                                        <Button Content="Edit details" Click="EditBook_OnClick" HorizontalAlignment="Left" />
+                                        <Button Content="{x:Static resources:Strings.EditDetails}" Click="EditBook_OnClick" HorizontalAlignment="Left" />
                                         <StackPanel IsVisible="{Binding IsEditing}" Spacing="6">
-                                            <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Title" />
-                                            <TextBox Text="{Binding Author, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Author" />
-                                            <TextBox Text="{Binding Isbn, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="ISBN" />
-                                            <TextBox Text="{Binding PageCount, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Pages" />
-                                            <Button Content="Save" Click="SaveBook_OnClick" HorizontalAlignment="Left" />
+                                            <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="{x:Static resources:Strings.Title}" />
+                                            <TextBox Text="{Binding Author, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="{x:Static resources:Strings.Author}" />
+                                            <TextBox Text="{Binding Isbn, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="{x:Static resources:Strings.Isbn}" />
+                                            <TextBox Text="{Binding PageCount, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="{x:Static resources:Strings.Pages}" />
+                                            <Button Content="{x:Static resources:Strings.Save}" Click="SaveBook_OnClick" HorizontalAlignment="Left" />
                                         </StackPanel>
                                     </StackPanel>
                                 </Border>
