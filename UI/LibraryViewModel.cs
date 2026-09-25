@@ -24,6 +24,8 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
 
     public ObservableCollection<Book> Books { get; } = new();
 
+    public int TotalBookCount { get; private set; }
+
     public IReadOnlyList<string> OrderOptions { get; } =
     [
         Strings.OrderByTitle,
@@ -104,6 +106,8 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
         private set => SetField(ref isBusy, value);
     }
 
+    public void SetStatusMessage(string message) => StatusMessage = message;
+
     public async Task InitializeAsync()
     {
         var settings = await new LibrarySettingsStore().LoadAsync();
@@ -148,7 +152,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
             var changedBooks = await syncService.SynchronizeAsync(LibraryFolder);
             await LoadBooksAsync();
             StatusMessage = changedBooks == 0
-                ? Strings.LibraryIsUpToDate
+                ? string.Format(Strings.LibraryIsUpToDateWithCount, TotalBookCount)
                 : string.Format(Strings.LibraryUpdatedFormat, changedBooks);
         }
         finally
@@ -194,6 +198,9 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
     private async Task LoadBooksAsync()
     {
         var books = await syncService.SearchAsync(SearchText);
+        TotalBookCount = string.IsNullOrWhiteSpace(SearchText)
+            ? books.Count
+            : (await syncService.SearchAsync()).Count;
         IEnumerable<Book> filteredBooks = SelectedFilter switch
         {
             var filter when filter == Strings.FilterEpub => books.Where(book => book.Format == "EPUB"),

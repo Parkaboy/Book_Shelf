@@ -4,14 +4,14 @@
         x:Class="Book_Shelf.UI.ConfigurationWindow"
         Title="{x:Static resources:Strings.Configuration}"
         Width="420"
-        Height="320"
+     Height="520"
         CanResize="False"
         WindowStartupLocation="CenterOwner">
     <StackPanel Margin="28" Spacing="12">
         <TextBlock Text="{x:Static resources:Strings.Configuration}"
                FontSize="22"
                FontWeight="SemiBold" />
-        <TextBlock Text="Theme" FontWeight="SemiBold" />
+        <TextBlock Text="{x:Static resources:Strings.Theme}" FontWeight="SemiBold" />
         <RadioButton x:Name="LightThemeRadioButton"
                  GroupName="Theme"
                  Content="{x:Static resources:Strings.Light}"
@@ -25,6 +25,15 @@
                  Content="{x:Static resources:Strings.System}"
                  IsChecked="True"
                  Click="Theme_OnClick" />
+        <TextBlock Text="{x:Static resources:Strings.Language}" FontWeight="SemiBold" Margin="0,12,0,0" />
+        <ComboBox x:Name="LanguageComboBox" SelectionChanged="Language_OnSelectionChanged">
+            <ComboBoxItem Tag="" Content="{x:Static resources:Strings.LanguageSystem}" />
+            <ComboBoxItem Tag="en" Content="{x:Static resources:Strings.LanguageEnglish}" />
+            <ComboBoxItem Tag="es" Content="{x:Static resources:Strings.LanguageSpanish}" />
+            <ComboBoxItem Tag="de" Content="{x:Static resources:Strings.LanguageGerman}" />
+            <ComboBoxItem Tag="pt-BR" Content="{x:Static resources:Strings.LanguagePortugueseBrazil}" />
+            <ComboBoxItem Tag="it" Content="{x:Static resources:Strings.LanguageItalian}" />
+        </ComboBox>
     </StackPanel>
 
 </Window>

@@ -79,6 +79,7 @@
             </MenuItem>
             <MenuItem Header="{x:Static resources:Strings.Configuration}" Click="Configuration_OnClick" />
             <MenuItem Header="{x:Static resources:Strings.Help}">
+                <MenuItem Header="{x:Static resources:Strings.ViewErrorLogs}" Click="ViewErrorLogs_OnClick" />
                 <MenuItem Header="{x:Static resources:Strings.AboutBookShelf}" Click="About_OnClick" />
             </MenuItem>
         </Menu>

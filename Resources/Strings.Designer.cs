@@ -35,7 +35,16 @@ public static class Strings
     public static string Exit => GetString(nameof(Exit));
     public static string Isbn => GetString(nameof(Isbn));
     public static string Library => GetString(nameof(Library));
+    public static string Theme => GetString(nameof(Theme));
+    public static string Language => GetString(nameof(Language));
+    public static string LanguageSystem => GetString(nameof(LanguageSystem));
+    public static string LanguageEnglish => GetString(nameof(LanguageEnglish));
+    public static string LanguageSpanish => GetString(nameof(LanguageSpanish));
+    public static string LanguageGerman => GetString(nameof(LanguageGerman));
+    public static string LanguagePortugueseBrazil => GetString(nameof(LanguagePortugueseBrazil));
+    public static string LanguageItalian => GetString(nameof(LanguageItalian));
     public static string LibraryIsUpToDate => GetString(nameof(LibraryIsUpToDate));
+    public static string LibraryIsUpToDateWithCount => GetString(nameof(LibraryIsUpToDateWithCount));
     public static string LibraryUpdatedFormat => GetString(nameof(LibraryUpdatedFormat));
     public static string OrderBy => GetString(nameof(OrderBy));
     public static string OrderByTitle => GetString(nameof(OrderByTitle));
@@ -67,6 +76,8 @@ public static class Strings
     public static string UpdatedBookFormat => GetString(nameof(UpdatedBookFormat));
     public static string Configuration => GetString(nameof(Configuration));
     public static string Help => GetString(nameof(Help));
+    public static string ViewErrorLogs => GetString(nameof(ViewErrorLogs));
+    public static string ErrorLogNotFound => GetString(nameof(ErrorLogNotFound));
     public static string YourLibrary => GetString(nameof(YourLibrary));
 
     private static string GetString(string name) => resourceManager.GetString(name, Culture) ?? name;
