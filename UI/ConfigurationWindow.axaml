@@ -1,0 +1,30 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:resources="using:Book_Shelf.Resources"
+        x:Class="Book_Shelf.UI.ConfigurationWindow"
+        Title="{x:Static resources:Strings.Configuration}"
+        Width="420"
+        Height="320"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner">
+    <StackPanel Margin="28" Spacing="12">
+        <TextBlock Text="{x:Static resources:Strings.Configuration}"
+               FontSize="22"
+               FontWeight="SemiBold" />
+        <TextBlock Text="Theme" FontWeight="SemiBold" />
+        <RadioButton x:Name="LightThemeRadioButton"
+                 GroupName="Theme"
+                 Content="{x:Static resources:Strings.Light}"
+                 Click="Theme_OnClick" />
+        <RadioButton x:Name="DarkThemeRadioButton"
+                 GroupName="Theme"
+                 Content="{x:Static resources:Strings.Dark}"
+                 Click="Theme_OnClick" />
+        <RadioButton x:Name="SystemThemeRadioButton"
+                 GroupName="Theme"
+                 Content="{x:Static resources:Strings.System}"
+                 IsChecked="True"
+                 Click="Theme_OnClick" />
+    </StackPanel>
+
+</Window>

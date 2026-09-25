@@ -51,7 +51,7 @@ public static class Strings
     public static string SearchTitleAuthorOrIsbn => GetString(nameof(SearchTitleAuthorOrIsbn));
     public static string Title => GetString(nameof(Title));
     public static string UpdatedBookFormat => GetString(nameof(UpdatedBookFormat));
-    public static string View => GetString(nameof(View));
+    public static string Configuration => GetString(nameof(Configuration));
     public static string Help => GetString(nameof(Help));
     public static string YourLibrary => GetString(nameof(YourLibrary));
 

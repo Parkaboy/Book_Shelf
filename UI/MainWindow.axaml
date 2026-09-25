@@ -74,13 +74,7 @@
                 <Separator />
                 <MenuItem Header="{x:Static resources:Strings.Exit}" Click="Exit_OnClick" />
             </MenuItem>
-            <MenuItem Header="{x:Static resources:Strings.View}">
-                <MenuItem Header="{x:Static resources:Strings.RefreshBooks}" Click="Rescan_OnClick" />
-                <Separator />
-                <MenuItem x:Name="LightThemeMenuItem" Header="{x:Static resources:Strings.Light}" IsChecked="False" Click="Theme_OnClick" />
-                <MenuItem x:Name="DarkThemeMenuItem" Header="{x:Static resources:Strings.Dark}" IsChecked="False" Click="Theme_OnClick" />
-                <MenuItem x:Name="SystemThemeMenuItem" Header="{x:Static resources:Strings.System}" IsChecked="True" Click="Theme_OnClick" />
-            </MenuItem>
+            <MenuItem Header="{x:Static resources:Strings.Configuration}" Click="Configuration_OnClick" />
             <MenuItem Header="{x:Static resources:Strings.Help}">
                 <MenuItem Header="{x:Static resources:Strings.AboutBookShelf}" Click="About_OnClick" />
             </MenuItem>
