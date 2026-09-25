@@ -27,6 +27,17 @@ public sealed class LocalBookCoverStrategy : IBookCoverStrategy
             .Concat(ImageExtensions.Select(extension => Path.Combine(directory, "cover" + extension)))
             .FirstOrDefault(File.Exists);
 
+        if (coverPath is null)
+        {
+            var imagePaths = Directory.EnumerateFiles(directory)
+                .Where(path => ImageExtensions.Contains(
+                    Path.GetExtension(path),
+                    System.StringComparer.OrdinalIgnoreCase))
+                .Take(2)
+                .ToArray();
+            coverPath = imagePaths.Length == 1 ? imagePaths[0] : null;
+        }
+
         return coverPath is null
             ? null
             : await CoverFileCache.CopyAsync(coverPath, destinationPath, cancellationToken);

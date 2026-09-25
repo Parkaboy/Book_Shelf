@@ -58,7 +58,7 @@
                 <MenuItem Header="{x:Static resources:Strings.RefreshBooks}" Click="Rescan_OnClick" />
             </MenuItem>
             <MenuItem Header="{x:Static resources:Strings.Help}">
-                <MenuItem Header="{x:Static resources:Strings.AboutBookShelf}" />
+                <MenuItem Header="{x:Static resources:Strings.AboutBookShelf}" Click="About_OnClick" />
             </MenuItem>
         </Menu>
 

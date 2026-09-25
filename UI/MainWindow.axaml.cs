@@ -85,6 +85,12 @@ public partial class MainWindow : Window
         }
     }
 
+    private async void About_OnClick(object? sender, RoutedEventArgs e)
+    {
+        var aboutWindow = new AboutWindow();
+        await aboutWindow.ShowDialog(this);
+    }
+
     private void Exit_OnClick(object? sender, RoutedEventArgs e)
     {
         Close();

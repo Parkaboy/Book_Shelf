@@ -16,9 +16,17 @@ public static class Strings
     public static CultureInfo? Culture { get; set; }
 
     public static string AboutBookShelf => GetString(nameof(AboutBookShelf));
+    public static string AboutCopyright => GetString(nameof(AboutCopyright));
+    public static string AboutDescription => GetString(nameof(AboutDescription));
+    public static string AboutLicense => GetString(nameof(AboutLicense));
+    public static string AboutTechnology => GetString(nameof(AboutTechnology));
+    public static string AboutVersion => GetString(nameof(AboutVersion));
     public static string Author => GetString(nameof(Author));
     public static string Book => GetString(nameof(Book));
     public static string BookShelf => GetString(nameof(BookShelf));
+    public static string BuyMeACoffeeMessage => GetString(nameof(BuyMeACoffeeMessage));
+    public static string BuyMeACoffeeUrl => GetString(nameof(BuyMeACoffeeUrl));
+    public static string Close => GetString(nameof(Close));
     public static string ChooseExistingLibraryFolderFirst => GetString(nameof(ChooseExistingLibraryFolderFirst));
     public static string ChooseLibraryFolder => GetString(nameof(ChooseLibraryFolder));
     public static string ChooseYourBookLibrary => GetString(nameof(ChooseYourBookLibrary));

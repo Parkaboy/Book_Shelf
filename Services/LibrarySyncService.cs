@@ -71,7 +71,8 @@ public sealed class LibrarySyncService
             var contentHash = await ComputeHashAsync(filePath, cancellationToken);
 
             if (book is not null && book.FileSize == fileInfo.Length &&
-                book.FileLastModifiedUtc == lastModifiedUtc && book.ContentHash == contentHash)
+                book.FileLastModifiedUtc == lastModifiedUtc && book.ContentHash == contentHash &&
+                book.CoverPath is not null && File.Exists(book.CoverPath))
             {
                 continue;
             }

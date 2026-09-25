@@ -5,6 +5,11 @@
   <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <data name="AboutBookShelf" xml:space="preserve"><value>About Book Shelf</value></data>
+  <data name="AboutCopyright" xml:space="preserve"><value>© 2026 Martín De León</value></data>
+  <data name="AboutDescription" xml:space="preserve"><value>Organize, browse, and edit metadata for your EPUB and PDF library.</value></data>
+  <data name="AboutLicense" xml:space="preserve"><value>Licensed under the MIT License.</value></data>
+  <data name="AboutTechnology" xml:space="preserve"><value>Built with .NET and Avalonia UI.</value></data>
+  <data name="AboutVersion" xml:space="preserve"><value>Version 1.0.0</value></data>
   <data name="Author" xml:space="preserve"><value>Author</value></data>
   <data name="Book" xml:space="preserve"><value>BOOK</value></data>
   <data name="ChooseExistingLibraryFolderFirst" xml:space="preserve"><value>Choose an existing library folder first.</value></data>
@@ -31,5 +36,8 @@
   <data name="View" xml:space="preserve"><value>View</value></data>
   <data name="Help" xml:space="preserve"><value>Help</value></data>
   <data name="BookShelf" xml:space="preserve"><value>Book Shelf</value></data>
+  <data name="BuyMeACoffeeMessage" xml:space="preserve"><value>Enjoying Book Shelf? Buy me a coffee</value></data>
+  <data name="BuyMeACoffeeUrl" xml:space="preserve"><value>https://www.buymeacoffee.com/parkaboy</value></data>
+  <data name="Close" xml:space="preserve"><value>Close</value></data>
   <data name="YourLibrary" xml:space="preserve"><value>Your library</value></data>
 </root>

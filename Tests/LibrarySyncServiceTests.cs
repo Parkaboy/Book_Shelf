@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -74,6 +75,45 @@ public sealed class LibrarySyncServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task SynchronizeAsync_UsesTheOnlyImageInBookDirectory()
+    {
+        var bookPath = Path.Combine(libraryFolder, "Dune.pdf");
+        var coverPath = Path.Combine(libraryFolder, "front-cover.jpg");
+        await File.WriteAllTextAsync(bookPath, "pdf content");
+        await File.WriteAllTextAsync(coverPath, "cover content");
+        var service = CreateService(strategies: new IBookCoverStrategy[]
+        {
+            new LocalBookCoverStrategy()
+        });
+
+        await service.SynchronizeAsync(libraryFolder);
+
+        var book = Assert.Single(await service.SearchAsync());
+        Assert.NotNull(book.CoverPath);
+        Assert.Equal("cover content", await File.ReadAllTextAsync(book.CoverPath));
+    }
+
+    [Fact]
+    public async Task SynchronizeAsync_FindsCoverAddedAfterBookWasImported()
+    {
+        var bookPath = Path.Combine(libraryFolder, "Dune.pdf");
+        var coverPath = Path.Combine(libraryFolder, "Dune.jpg");
+        await File.WriteAllTextAsync(bookPath, "pdf content");
+        var service = CreateService(strategies: new IBookCoverStrategy[]
+        {
+            new LocalBookCoverStrategy()
+        });
+
+        await service.SynchronizeAsync(libraryFolder);
+        await File.WriteAllTextAsync(coverPath, "cover content");
+        await service.SynchronizeAsync(libraryFolder);
+
+        var book = Assert.Single(await service.SearchAsync());
+        Assert.NotNull(book.CoverPath);
+        Assert.Equal("cover content", await File.ReadAllTextAsync(book.CoverPath));
+    }
+
+    [Fact]
     public async Task SynchronizeAsync_UsesGoogleBooksCoverByIsbn()
     {
         var bookPath = Path.Combine(libraryFolder, "Dune.pdf");
@@ -116,7 +156,9 @@ public sealed class LibrarySyncServiceTests : IDisposable
         }
     }
 
-    private LibrarySyncService CreateService(HttpMessageHandler? handler = null)
+    private LibrarySyncService CreateService(
+        HttpMessageHandler? handler = null,
+        IReadOnlyList<IBookCoverStrategy>? strategies = null)
     {
         handler ??= new GoogleBooksHandler();
         return new LibrarySyncService(() =>
@@ -125,9 +167,9 @@ public sealed class LibrarySyncServiceTests : IDisposable
                 .UseSqlite($"Data Source={databasePath};Pooling=False")
                 .Options;
             return new LibraryDbContext(options);
-        }, new BookCoverService(
-            Path.Combine(testRoot, "covers"),
-            new HttpClient(handler)));
+        }, strategies is null
+            ? new BookCoverService(Path.Combine(testRoot, "covers"), new HttpClient(handler))
+            : new BookCoverService(Path.Combine(testRoot, "covers"), strategies));
     }
 
     private sealed class GoogleBooksHandler : HttpMessageHandler
