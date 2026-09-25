@@ -131,9 +131,10 @@ public sealed class LibrarySyncService
         if (!string.IsNullOrWhiteSpace(searchText))
         {
             var term = searchText.Trim();
-            query = query.Where(book => book.Title.Contains(term) ||
-                                        (book.Author != null && book.Author.Contains(term)) ||
-                                        (book.Isbn != null && book.Isbn.Contains(term)));
+            var normalizedTerm = term.ToLower();
+            query = query.Where(book => book.Title.ToLower().Contains(normalizedTerm) ||
+                                        (book.Author != null && book.Author.ToLower().Contains(normalizedTerm)) ||
+                                        (book.Isbn != null && book.Isbn.ToLower().Contains(normalizedTerm)));
         }
 
         return await query.OrderBy(book => book.Title).ToListAsync(cancellationToken);

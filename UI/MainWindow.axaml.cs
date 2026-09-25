@@ -126,6 +126,21 @@ public partial class MainWindow : Window
         await aboutWindow.ShowDialog(this);
     }
 
+    private void ViewErrorLogs_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (!File.Exists(Program.ErrorLogPath))
+        {
+            viewModel.SetStatusMessage(Strings.ErrorLogNotFound);
+            return;
+        }
+
+        Process.Start(new ProcessStartInfo
+        {
+            FileName = Program.ErrorLogPath,
+            UseShellExecute = true
+        });
+    }
+
     private void Exit_OnClick(object? sender, RoutedEventArgs e)
     {
         Close();

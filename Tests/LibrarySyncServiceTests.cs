@@ -43,6 +43,20 @@ public sealed class LibrarySyncServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task SearchAsync_IsCaseInsensitive()
+    {
+        await File.WriteAllTextAsync(Path.Combine(libraryFolder, "Hask.epub"), "epub content");
+        var service = CreateService();
+
+        await service.SynchronizeAsync(libraryFolder);
+
+        var books = await service.SearchAsync("hask");
+
+        Assert.Single(books);
+        Assert.Equal("Hask", books[0].Title);
+    }
+
+    [Fact]
     public async Task SynchronizeAsync_DoesNotDuplicateUnchangedBooks()
     {
         await File.WriteAllTextAsync(Path.Combine(libraryFolder, "Dune.pdf"), "pdf content");
