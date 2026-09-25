@@ -5,6 +5,7 @@
         xmlns:vm="using:Book_Shelf.UI"
         xmlns:models="using:Book_Shelf.Models"
         xmlns:resources="using:Book_Shelf.Resources"
+        xmlns:automation="using:Avalonia.Automation"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Book_Shelf.MainWindow"
         x:DataType="vm:LibraryViewModel"
@@ -40,6 +41,7 @@
             <Setter Property="Padding" Value="12" />
             <Setter Property="Margin" Value="0,0,16,16" />
             <Setter Property="Focusable" Value="True" />
+            <Setter Property="IsTabStop" Value="True" />
             <Setter Property="RenderTransform" Value="scale(1)" />
             <Setter Property="Transitions">
                 <Transitions>
@@ -67,7 +69,9 @@
     </Window.Styles>
 
     <DockPanel Background="{DynamicResource LibraryBackgroundColor}">
-        <Menu DockPanel.Dock="Top" Background="{DynamicResource LibrarySurfaceColor}">
+        <Menu DockPanel.Dock="Top"
+              Background="{DynamicResource LibrarySurfaceColor}"
+              automation:AutomationProperties.LandmarkType="Navigation">
             <MenuItem Header="{x:Static resources:Strings.Library}">
                 <MenuItem Header="{x:Static resources:Strings.ChooseLibraryFolder}" Click="ChooseFolder_OnClick" />
                 <MenuItem Header="{x:Static resources:Strings.RescanLibrary}" Click="Rescan_OnClick" />
@@ -84,21 +88,33 @@
             </MenuItem>
         </Menu>
 
-        <Grid RowDefinitions="Auto,*" Margin="28,24,28,0">
+          <Grid RowDefinitions="Auto,*"
+              Margin="28,24,28,0"
+              automation:AutomationProperties.LandmarkType="Main">
             <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,24">
                 <StackPanel Spacing="6">
                     <TextBlock Text="{x:Static resources:Strings.YourLibrary}" FontSize="30" FontWeight="SemiBold" Foreground="{DynamicResource LibraryTextColor}" />
                     <TextBlock Text="{Binding LibraryFolder}" Classes="label" />
                 </StackPanel>
-                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            Spacing="8"
+                            VerticalAlignment="Center"
+                            automation:AutomationProperties.LandmarkType="Search">
                     <TextBox Width="260"
+                             TabIndex="1"
+                             automation:AutomationProperties.Name="{x:Static resources:Strings.SearchTitleAuthorOrIsbn}"
                              PlaceholderText="{x:Static resources:Strings.SearchTitleAuthorOrIsbn}"
                              Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
                     <ComboBox Width="145"
+                              TabIndex="2"
+                              automation:AutomationProperties.Name="{x:Static resources:Strings.OrderBy}"
                               ItemsSource="{Binding OrderOptions}"
                               SelectedItem="{Binding SelectedOrder}"
                               PlaceholderText="{x:Static resources:Strings.OrderBy}" />
                     <ComboBox Width="125"
+                              TabIndex="3"
+                              automation:AutomationProperties.Name="{x:Static resources:Strings.Filter}"
                               ItemsSource="{Binding FilterOptions}"
                               SelectedItem="{Binding SelectedFilter}"
                               PlaceholderText="{x:Static resources:Strings.Filter}" />
@@ -107,7 +123,10 @@
 
             <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                 <StackPanel>
-                    <TextBlock Text="{Binding StatusMessage}" Classes="label" Margin="0,0,0,16" />
+                    <TextBlock Text="{Binding StatusMessage}"
+                               Classes="label"
+                               Margin="0,0,0,16"
+                               automation:AutomationProperties.LiveSetting="Polite" />
                     <ItemsControl ItemsSource="{Binding Books}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -119,6 +138,9 @@
                                 <Border Classes="book-card"
                                         Width="260"
                                         Tag="{Binding IsSelected}"
+                                    automation:AutomationProperties.Name="{Binding Title}"
+                                    automation:AutomationProperties.HelpText="{Binding Author}"
+                                    automation:AutomationProperties.ControlTypeOverride="Button"
                                         PointerPressed="BookCard_PointerPressed"
                                         DoubleTapped="BookCard_DoubleTapped">
                                     <StackPanel Spacing="10">
@@ -129,7 +151,9 @@
                                                     <TextBlock Text="{Binding Title}" Foreground="White" FontSize="20" FontWeight="SemiBold" TextWrapping="Wrap" TextAlignment="Center" MaxHeight="100" />
                                                     <TextBlock Text="{Binding Author}" Foreground="#DCE7EC" FontSize="12" TextWrapping="Wrap" TextAlignment="Center" />
                                                 </StackPanel>
-                                                <Image Source="{Binding CoverPath}" Stretch="UniformToFill" />
+                                                      <Image Source="{Binding CoverPath}"
+                                                          Stretch="UniformToFill"
+                                                          automation:AutomationProperties.AccessibilityView="Raw" />
                                             </Grid>
                                         </Border>
                                         <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource LibraryTextColor}" TextWrapping="Wrap" MaxHeight="48" />
@@ -139,14 +163,19 @@
                                             <TextBlock Grid.Column="1" Text="{Binding PageCount, StringFormat={x:Static resources:Strings.PageCountFormat}}" Classes="label" />
                                         </Grid>
                                         
-                                        <Button Content="{x:Static resources:Strings.EditDetails}" Click="EditBook_OnClick" HorizontalAlignment="Left" />
-                                        <Button Content="{x:Static resources:Strings.Delete}" Click="DeleteBook_OnClick" />
+                                        <Button Content="{x:Static resources:Strings.EditDetails}"
+                                            automation:AutomationProperties.HelpText="{Binding Title}"
+                                            Click="EditBook_OnClick"
+                                            HorizontalAlignment="Left" />
+                                        <Button Content="{x:Static resources:Strings.Delete}"
+                                            automation:AutomationProperties.HelpText="{Binding Title}"
+                                            Click="DeleteBook_OnClick" />
                                         
                                         <StackPanel IsVisible="{Binding IsEditing}" Spacing="6">
-                                            <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="{x:Static resources:Strings.Title}" />
-                                            <TextBox Text="{Binding Author, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="{x:Static resources:Strings.Author}" />
-                                            <TextBox Text="{Binding Isbn, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="{x:Static resources:Strings.Isbn}" />
-                                            <TextBox Text="{Binding PageCount, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="{x:Static resources:Strings.Pages}" />
+                                            <TextBox automation:AutomationProperties.Name="{x:Static resources:Strings.Title}" Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="{x:Static resources:Strings.Title}" />
+                                            <TextBox automation:AutomationProperties.Name="{x:Static resources:Strings.Author}" Text="{Binding Author, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="{x:Static resources:Strings.Author}" />
+                                            <TextBox automation:AutomationProperties.Name="{x:Static resources:Strings.Isbn}" Text="{Binding Isbn, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="{x:Static resources:Strings.Isbn}" />
+                                            <TextBox automation:AutomationProperties.Name="{x:Static resources:Strings.Pages}" Text="{Binding PageCount, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="{x:Static resources:Strings.Pages}" />
                                             <StackPanel Orientation="Horizontal" Spacing="8">
                                                 <Button Content="{x:Static resources:Strings.Save}" Click="SaveBook_OnClick" />
 
