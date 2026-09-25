@@ -37,6 +37,9 @@ public static class Strings
     public static string Library => GetString(nameof(Library));
     public static string LibraryIsUpToDate => GetString(nameof(LibraryIsUpToDate));
     public static string LibraryUpdatedFormat => GetString(nameof(LibraryUpdatedFormat));
+    public static string Light => GetString(nameof(Light));
+    public static string Dark => GetString(nameof(Dark));
+    public static string System => GetString(nameof(System));
     public static string NoLibraryFolderSelected => GetString(nameof(NoLibraryFolderSelected));
     public static string Pages => GetString(nameof(Pages));
     public static string PageCountFormat => GetString(nameof(PageCountFormat));

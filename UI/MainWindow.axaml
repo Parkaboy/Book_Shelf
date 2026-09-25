@@ -11,10 +11,30 @@
         Title="{x:Static resources:Strings.BookShelf}"
         MinWidth="900"
         MinHeight="600">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <Color x:Key="LibraryBackgroundColor">#F5F2ED</Color>
+                    <Color x:Key="LibrarySurfaceColor">#FFFFFF</Color>
+                    <Color x:Key="LibraryBorderColor">#E3E0DA</Color>
+                    <Color x:Key="LibraryTextColor">#263238</Color>
+                    <Color x:Key="LibraryMutedTextColor">#756F66</Color>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <Color x:Key="LibraryBackgroundColor">#1E2528</Color>
+                    <Color x:Key="LibrarySurfaceColor">#293337</Color>
+                    <Color x:Key="LibraryBorderColor">#46545A</Color>
+                    <Color x:Key="LibraryTextColor">#F1F5F6</Color>
+                    <Color x:Key="LibraryMutedTextColor">#B7C2C6</Color>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
     <Window.Styles>
         <Style Selector="Border.book-card">
-            <Setter Property="Background" Value="#FFFFFF" />
-            <Setter Property="BorderBrush" Value="#E3E0DA" />
+            <Setter Property="Background" Value="{DynamicResource LibrarySurfaceColor}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource LibraryBorderColor}" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="CornerRadius" Value="8" />
             <Setter Property="Padding" Value="12" />
@@ -41,13 +61,13 @@
             <Setter Property="CornerRadius" Value="5" />
         </Style>
         <Style Selector="TextBlock.label">
-            <Setter Property="Foreground" Value="#756F66" />
+            <Setter Property="Foreground" Value="{DynamicResource LibraryMutedTextColor}" />
             <Setter Property="FontSize" Value="12" />
         </Style>
     </Window.Styles>
 
-    <DockPanel Background="#F5F2ED">
-        <Menu DockPanel.Dock="Top" Background="#FFFFFF">
+    <DockPanel Background="{DynamicResource LibraryBackgroundColor}">
+        <Menu DockPanel.Dock="Top" Background="{DynamicResource LibrarySurfaceColor}">
             <MenuItem Header="{x:Static resources:Strings.Library}">
                 <MenuItem Header="{x:Static resources:Strings.ChooseLibraryFolder}" Click="ChooseFolder_OnClick" />
                 <MenuItem Header="{x:Static resources:Strings.RescanLibrary}" Click="Rescan_OnClick" />
@@ -56,6 +76,10 @@
             </MenuItem>
             <MenuItem Header="{x:Static resources:Strings.View}">
                 <MenuItem Header="{x:Static resources:Strings.RefreshBooks}" Click="Rescan_OnClick" />
+                <Separator />
+                <MenuItem x:Name="LightThemeMenuItem" Header="{x:Static resources:Strings.Light}" IsChecked="False" Click="Theme_OnClick" />
+                <MenuItem x:Name="DarkThemeMenuItem" Header="{x:Static resources:Strings.Dark}" IsChecked="False" Click="Theme_OnClick" />
+                <MenuItem x:Name="SystemThemeMenuItem" Header="{x:Static resources:Strings.System}" IsChecked="True" Click="Theme_OnClick" />
             </MenuItem>
             <MenuItem Header="{x:Static resources:Strings.Help}">
                 <MenuItem Header="{x:Static resources:Strings.AboutBookShelf}" Click="About_OnClick" />
@@ -65,7 +89,7 @@
         <Grid RowDefinitions="Auto,*" Margin="28,24,28,0">
             <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,24">
                 <StackPanel Spacing="6">
-                    <TextBlock Text="{x:Static resources:Strings.YourLibrary}" FontSize="30" FontWeight="SemiBold" Foreground="#263238" />
+                    <TextBlock Text="{x:Static resources:Strings.YourLibrary}" FontSize="30" FontWeight="SemiBold" Foreground="{DynamicResource LibraryTextColor}" />
                     <TextBlock Text="{Binding LibraryFolder}" Classes="label" />
                 </StackPanel>
                 <TextBox Grid.Column="1"
@@ -102,7 +126,7 @@
                                                 <Image Source="{Binding CoverPath}" Stretch="UniformToFill" />
                                             </Grid>
                                         </Border>
-                                        <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="SemiBold" Foreground="#263238" TextWrapping="Wrap" MaxHeight="48" />
+                                        <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource LibraryTextColor}" TextWrapping="Wrap" MaxHeight="48" />
                                         <TextBlock Text="{Binding Author}" Classes="label" TextWrapping="Wrap" />
                                         <Grid ColumnDefinitions="*,Auto">
                                             <TextBlock Text="{Binding Format}" Classes="label" />

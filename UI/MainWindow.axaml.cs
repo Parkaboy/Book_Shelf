@@ -1,9 +1,11 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
+using Avalonia.Styling;
 using Book_Shelf.Models;
 using Book_Shelf.Resources;
 using Book_Shelf.UI;
@@ -94,5 +96,25 @@ public partial class MainWindow : Window
     private void Exit_OnClick(object? sender, RoutedEventArgs e)
     {
         Close();
+    }
+
+    private void Theme_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (sender == LightThemeMenuItem)
+        {
+            Application.Current!.RequestedThemeVariant = ThemeVariant.Light;
+        }
+        else if (sender == DarkThemeMenuItem)
+        {
+            Application.Current!.RequestedThemeVariant = ThemeVariant.Dark;
+        }
+        else if (sender == SystemThemeMenuItem)
+        {
+            Application.Current!.RequestedThemeVariant = ThemeVariant.Default;
+        }
+
+        LightThemeMenuItem.IsChecked = sender == LightThemeMenuItem;
+        DarkThemeMenuItem.IsChecked = sender == DarkThemeMenuItem;
+        SystemThemeMenuItem.IsChecked = sender == SystemThemeMenuItem;
     }
 }

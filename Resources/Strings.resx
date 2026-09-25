@@ -22,6 +22,9 @@
   <data name="Library" xml:space="preserve"><value>Library</value></data>
   <data name="LibraryIsUpToDate" xml:space="preserve"><value>Library is up to date.</value></data>
   <data name="LibraryUpdatedFormat" xml:space="preserve"><value>Library updated: {0} change(s).</value></data>
+  <data name="Light" xml:space="preserve"><value>Light</value></data>
+  <data name="Dark" xml:space="preserve"><value>Dark</value></data>
+  <data name="System" xml:space="preserve"><value>System</value></data>
   <data name="NoLibraryFolderSelected" xml:space="preserve"><value>No library folder selected</value></data>
   <data name="Pages" xml:space="preserve"><value>Pages</value></data>
   <data name="PageCountFormat" xml:space="preserve"><value>{0} pages</value></data>
