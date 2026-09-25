@@ -9,6 +9,7 @@ public sealed class Book : INotifyPropertyChanged
 {
     private bool isSelected;
     private bool isEditing;
+    private string? coverPath;
 
     public int Id { get; set; }
 
@@ -29,6 +30,12 @@ public sealed class Book : INotifyPropertyChanged
     public DateTime FileLastModifiedUtc { get; set; }
 
     public required string ContentHash { get; set; }
+
+    public string? CoverPath
+    {
+        get => coverPath;
+        set => SetField(ref coverPath, value);
+    }
 
     public DateTime ImportedUtc { get; set; }
 

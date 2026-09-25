@@ -1,11 +1,14 @@
-using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Book_Shelf.Data;
 using Book_Shelf.Models;
+using Book_Shelf.Resources;
+using Book_Shelf.Services;
 
 namespace Book_Shelf.UI;
 
@@ -13,11 +16,27 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
 {
     private readonly LibrarySyncService syncService = new();
     private string? searchText;
-    private string libraryFolder = "No library folder selected";
-    private string statusMessage = "Choose a library folder to begin.";
+    private string selectedOrder = Strings.OrderByTitle;
+    private string selectedFilter = Strings.FilterAll;
+    private string libraryFolder = Strings.NoLibraryFolderSelected;
+    private string statusMessage = Strings.ChooseLibraryFolderToBegin;
     private bool isBusy;
 
     public ObservableCollection<Book> Books { get; } = new();
+
+    public IReadOnlyList<string> OrderOptions { get; } =
+    [
+        Strings.OrderByTitle,
+        Strings.OrderByAuthor,
+        Strings.OrderByDateAdded
+    ];
+
+    public IReadOnlyList<string> FilterOptions { get; } =
+    [
+        Strings.FilterAll,
+        Strings.FilterEpub,
+        Strings.FilterPdf
+    ];
 
     public string? SearchText
     {
@@ -30,6 +49,38 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
             }
 
             searchText = value;
+            OnPropertyChanged();
+            _ = LoadBooksAsync();
+        }
+    }
+
+    public string SelectedOrder
+    {
+        get => selectedOrder;
+        set
+        {
+            if (selectedOrder == value)
+            {
+                return;
+            }
+
+            selectedOrder = value;
+            OnPropertyChanged();
+            _ = LoadBooksAsync();
+        }
+    }
+
+    public string SelectedFilter
+    {
+        get => selectedFilter;
+        set
+        {
+            if (selectedFilter == value)
+            {
+                return;
+            }
+
+            selectedFilter = value;
             OnPropertyChanged();
             _ = LoadBooksAsync();
         }
@@ -69,7 +120,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
         }
         else
         {
-            StatusMessage = "The saved library folder is no longer available.";
+            StatusMessage = Strings.SavedLibraryFolderUnavailable;
             await LoadBooksAsync();
         }
     }
@@ -84,21 +135,21 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
 
     public async Task SynchronizeAsync()
     {
-        if (LibraryFolder == "No library folder selected" || !Directory.Exists(LibraryFolder))
+        if (LibraryFolder == Strings.NoLibraryFolderSelected || !Directory.Exists(LibraryFolder))
         {
-            StatusMessage = "Choose an existing library folder first.";
+            StatusMessage = Strings.ChooseExistingLibraryFolderFirst;
             return;
         }
 
         IsBusy = true;
-        StatusMessage = "Scanning library...";
+        StatusMessage = Strings.ScanningLibrary;
         try
         {
             var changedBooks = await syncService.SynchronizeAsync(LibraryFolder);
             await LoadBooksAsync();
             StatusMessage = changedBooks == 0
-                ? "Library is up to date."
-                : $"Library updated: {changedBooks} change(s).";
+                ? Strings.LibraryIsUpToDate
+                : string.Format(Strings.LibraryUpdatedFormat, changedBooks);
         }
         finally
         {
@@ -123,14 +174,42 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
     {
         await syncService.SaveBookAsync(book);
         book.IsEditing = false;
-        StatusMessage = $"Updated {book.Title}.";
+        StatusMessage = string.Format(Strings.UpdatedBookFormat, book.Title);
+    }
+
+    public async Task DeleteBookAsync(Book book)
+    {
+        await syncService.DeleteBookAsync(book);
+        await LoadBooksAsync();
+        StatusMessage = string.Format(Strings.DeletedBookFormat, book.Title);
+    }
+
+    public async Task ClearDatabaseAsync()
+    {
+        await syncService.ClearDatabaseAsync();
+        await LoadBooksAsync();
+        StatusMessage = Strings.DatabaseCleaned;
     }
 
     private async Task LoadBooksAsync()
     {
         var books = await syncService.SearchAsync(SearchText);
+        IEnumerable<Book> filteredBooks = SelectedFilter switch
+        {
+            var filter when filter == Strings.FilterEpub => books.Where(book => book.Format == "EPUB"),
+            var filter when filter == Strings.FilterPdf => books.Where(book => book.Format == "PDF"),
+            _ => books
+        };
+
+        filteredBooks = SelectedOrder switch
+        {
+            var order when order == Strings.OrderByAuthor => filteredBooks.OrderBy(book => book.Author ?? book.Title),
+            var order when order == Strings.OrderByDateAdded => filteredBooks.OrderByDescending(book => book.ImportedUtc),
+            _ => filteredBooks.OrderBy(book => book.Title)
+        };
+
         Books.Clear();
-        foreach (var book in books)
+        foreach (var book in filteredBooks)
         {
             Books.Add(book);
         }

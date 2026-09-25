@@ -4,7 +4,9 @@ using System.IO;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
+using Book_Shelf.Data;
 using Book_Shelf.Models;
+using Book_Shelf.Resources;
 using Book_Shelf.UI;
 
 namespace Book_Shelf;
@@ -31,7 +33,7 @@ public partial class MainWindow : Window
         var folders = await StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
         {
             AllowMultiple = false,
-            Title = "Choose your book library"
+            Title = Strings.ChooseYourBookLibrary
         });
 
         if (folders.Count > 0 && folders[0].TryGetLocalPath() is string folderPath)
@@ -43,6 +45,32 @@ public partial class MainWindow : Window
     private async void Rescan_OnClick(object? sender, RoutedEventArgs e)
     {
         await viewModel.SynchronizeAsync();
+    }
+
+    private async void ExportDatabase_OnClick(object? sender, RoutedEventArgs e)
+    {
+        var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        {
+            Title = Strings.ExportDatabase,
+            SuggestedFileName = "books.db",
+            FileTypeChoices =
+            [
+                new FilePickerFileType(Strings.SQLiteDatabase)
+                {
+                    Patterns = ["*.db"]
+                }
+            ]
+        });
+
+        if (file?.TryGetLocalPath() is string destinationPath)
+        {
+            File.Copy(LibraryDbContext.GetDatabasePath(), destinationPath, overwrite: true);
+        }
+    }
+
+    private async void CleanDatabase_OnClick(object? sender, RoutedEventArgs e)
+    {
+        await viewModel.ClearDatabaseAsync();
     }
 
     private void BookCard_DoubleTapped(object? sender, RoutedEventArgs e)
@@ -84,8 +112,31 @@ public partial class MainWindow : Window
         }
     }
 
+    private async void DeleteBook_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Control { DataContext: Book book })
+        {
+            await viewModel.DeleteBookAsync(book);
+        }
+    }
+
+    private async void About_OnClick(object? sender, RoutedEventArgs e)
+    {
+        var aboutWindow = new AboutWindow();
+        await aboutWindow.ShowDialog(this);
+    }
+
     private void Exit_OnClick(object? sender, RoutedEventArgs e)
     {
         Close();
     }
+
+
+    private async void Configuration_OnClick(object? sender, RoutedEventArgs e)
+{
+    var configurationWindow = new ConfigurationWindow();
+    await configurationWindow.ShowDialog(this);
+}
+
+
 }

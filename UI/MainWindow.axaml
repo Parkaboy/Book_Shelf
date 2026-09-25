@@ -4,16 +4,37 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="using:Book_Shelf.UI"
         xmlns:models="using:Book_Shelf.Models"
+        xmlns:resources="using:Book_Shelf.Resources"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Book_Shelf.MainWindow"
         x:DataType="vm:LibraryViewModel"
-        Title="Book Shelf"
+        Title="{x:Static resources:Strings.BookShelf}"
         MinWidth="900"
         MinHeight="600">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <Color x:Key="LibraryBackgroundColor">#F5F2ED</Color>
+                    <Color x:Key="LibrarySurfaceColor">#FFFFFF</Color>
+                    <Color x:Key="LibraryBorderColor">#E3E0DA</Color>
+                    <Color x:Key="LibraryTextColor">#263238</Color>
+                    <Color x:Key="LibraryMutedTextColor">#756F66</Color>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <Color x:Key="LibraryBackgroundColor">#1E2528</Color>
+                    <Color x:Key="LibrarySurfaceColor">#293337</Color>
+                    <Color x:Key="LibraryBorderColor">#46545A</Color>
+                    <Color x:Key="LibraryTextColor">#F1F5F6</Color>
+                    <Color x:Key="LibraryMutedTextColor">#B7C2C6</Color>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
     <Window.Styles>
         <Style Selector="Border.book-card">
-            <Setter Property="Background" Value="#FFFFFF" />
-            <Setter Property="BorderBrush" Value="#E3E0DA" />
+            <Setter Property="Background" Value="{DynamicResource LibrarySurfaceColor}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource LibraryBorderColor}" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="CornerRadius" Value="8" />
             <Setter Property="Padding" Value="12" />
@@ -40,38 +61,47 @@
             <Setter Property="CornerRadius" Value="5" />
         </Style>
         <Style Selector="TextBlock.label">
-            <Setter Property="Foreground" Value="#756F66" />
+            <Setter Property="Foreground" Value="{DynamicResource LibraryMutedTextColor}" />
             <Setter Property="FontSize" Value="12" />
         </Style>
     </Window.Styles>
 
-    <DockPanel Background="#F5F2ED">
-        <Menu DockPanel.Dock="Top" Background="#FFFFFF">
-            <MenuItem Header="Library">
-                <MenuItem Header="Choose library folder..." Click="ChooseFolder_OnClick" />
-                <MenuItem Header="Rescan library" Click="Rescan_OnClick" />
+    <DockPanel Background="{DynamicResource LibraryBackgroundColor}">
+        <Menu DockPanel.Dock="Top" Background="{DynamicResource LibrarySurfaceColor}">
+            <MenuItem Header="{x:Static resources:Strings.Library}">
+                <MenuItem Header="{x:Static resources:Strings.ChooseLibraryFolder}" Click="ChooseFolder_OnClick" />
+                <MenuItem Header="{x:Static resources:Strings.RescanLibrary}" Click="Rescan_OnClick" />
                 <Separator />
-                <MenuItem Header="Exit" Click="Exit_OnClick" />
+                <MenuItem Header="{x:Static resources:Strings.ExportDatabase}" Click="ExportDatabase_OnClick" />
+                <MenuItem Header="{x:Static resources:Strings.CleanDatabase}" Click="CleanDatabase_OnClick" />
+                <Separator />
+                <MenuItem Header="{x:Static resources:Strings.Exit}" Click="Exit_OnClick" />
             </MenuItem>
-            <MenuItem Header="View">
-                <MenuItem Header="Refresh books" Click="Rescan_OnClick" />
-            </MenuItem>
-            <MenuItem Header="Help">
-                <MenuItem Header="About Book Shelf" />
+            <MenuItem Header="{x:Static resources:Strings.Configuration}" Click="Configuration_OnClick" />
+            <MenuItem Header="{x:Static resources:Strings.Help}">
+                <MenuItem Header="{x:Static resources:Strings.AboutBookShelf}" Click="About_OnClick" />
             </MenuItem>
         </Menu>
 
         <Grid RowDefinitions="Auto,*" Margin="28,24,28,0">
             <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,24">
                 <StackPanel Spacing="6">
-                    <TextBlock Text="Your library" FontSize="30" FontWeight="SemiBold" Foreground="#263238" />
+                    <TextBlock Text="{x:Static resources:Strings.YourLibrary}" FontSize="30" FontWeight="SemiBold" Foreground="{DynamicResource LibraryTextColor}" />
                     <TextBlock Text="{Binding LibraryFolder}" Classes="label" />
                 </StackPanel>
-                <TextBox Grid.Column="1"
-                         Width="260"
-                         VerticalAlignment="Center"
-                         PlaceholderText="Search title, author or ISBN"
-                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <TextBox Width="260"
+                             PlaceholderText="{x:Static resources:Strings.SearchTitleAuthorOrIsbn}"
+                             Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+                    <ComboBox Width="145"
+                              ItemsSource="{Binding OrderOptions}"
+                              SelectedItem="{Binding SelectedOrder}"
+                              PlaceholderText="{x:Static resources:Strings.OrderBy}" />
+                    <ComboBox Width="125"
+                              ItemsSource="{Binding FilterOptions}"
+                              SelectedItem="{Binding SelectedFilter}"
+                              PlaceholderText="{x:Static resources:Strings.Filter}" />
+                </StackPanel>
             </Grid>
 
             <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
@@ -92,25 +122,34 @@
                                         DoubleTapped="BookCard_DoubleTapped">
                                     <StackPanel Spacing="10">
                                         <Border Classes="cover" Height="320">
-                                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="18" Spacing="10">
-                                                <TextBlock Text="BOOK" Foreground="#DCE7EC" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center" />
-                                                <TextBlock Text="{Binding Title}" Foreground="White" FontSize="20" FontWeight="SemiBold" TextWrapping="Wrap" TextAlignment="Center" MaxHeight="100" />
-                                                <TextBlock Text="{Binding Author}" Foreground="#DCE7EC" FontSize="12" TextWrapping="Wrap" TextAlignment="Center" />
-                                            </StackPanel>
+                                            <Grid>
+                                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="18" Spacing="10">
+                                                    <TextBlock Text="{x:Static resources:Strings.Book}" Foreground="#DCE7EC" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center" />
+                                                    <TextBlock Text="{Binding Title}" Foreground="White" FontSize="20" FontWeight="SemiBold" TextWrapping="Wrap" TextAlignment="Center" MaxHeight="100" />
+                                                    <TextBlock Text="{Binding Author}" Foreground="#DCE7EC" FontSize="12" TextWrapping="Wrap" TextAlignment="Center" />
+                                                </StackPanel>
+                                                <Image Source="{Binding CoverPath}" Stretch="UniformToFill" />
+                                            </Grid>
                                         </Border>
-                                        <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="SemiBold" Foreground="#263238" TextWrapping="Wrap" MaxHeight="48" />
+                                        <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource LibraryTextColor}" TextWrapping="Wrap" MaxHeight="48" />
                                         <TextBlock Text="{Binding Author}" Classes="label" TextWrapping="Wrap" />
                                         <Grid ColumnDefinitions="*,Auto">
                                             <TextBlock Text="{Binding Format}" Classes="label" />
-                                            <TextBlock Grid.Column="1" Text="{Binding PageCount, StringFormat='{}{0} pages'}" Classes="label" />
+                                            <TextBlock Grid.Column="1" Text="{Binding PageCount, StringFormat={x:Static resources:Strings.PageCountFormat}}" Classes="label" />
                                         </Grid>
-                                        <Button Content="Edit details" Click="EditBook_OnClick" HorizontalAlignment="Left" />
+                                        
+                                        <Button Content="{x:Static resources:Strings.EditDetails}" Click="EditBook_OnClick" HorizontalAlignment="Left" />
+                                        <Button Content="{x:Static resources:Strings.Delete}" Click="DeleteBook_OnClick" />
+                                        
                                         <StackPanel IsVisible="{Binding IsEditing}" Spacing="6">
-                                            <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Title" />
-                                            <TextBox Text="{Binding Author, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Author" />
-                                            <TextBox Text="{Binding Isbn, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="ISBN" />
-                                            <TextBox Text="{Binding PageCount, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Pages" />
-                                            <Button Content="Save" Click="SaveBook_OnClick" HorizontalAlignment="Left" />
+                                            <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="{x:Static resources:Strings.Title}" />
+                                            <TextBox Text="{Binding Author, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="{x:Static resources:Strings.Author}" />
+                                            <TextBox Text="{Binding Isbn, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="{x:Static resources:Strings.Isbn}" />
+                                            <TextBox Text="{Binding PageCount, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="{x:Static resources:Strings.Pages}" />
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <Button Content="{x:Static resources:Strings.Save}" Click="SaveBook_OnClick" />
+
+                                            </StackPanel>
                                         </StackPanel>
                                     </StackPanel>
                                 </Border>

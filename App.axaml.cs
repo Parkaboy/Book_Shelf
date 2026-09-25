@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Book_Shelf.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Book_Shelf;
 
@@ -28,7 +29,7 @@ public partial class App : Application
     {
         await using (var database = LibraryDbContext.Create())
         {
-            await database.Database.EnsureCreatedAsync();
+            await database.Database.MigrateAsync();
         }
 
     }

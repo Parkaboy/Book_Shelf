@@ -1,0 +1,31 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:resources="using:Book_Shelf.Resources"
+        x:Class="Book_Shelf.UI.AboutWindow"
+        Title="{x:Static resources:Strings.AboutBookShelf}"
+        Width="420"
+        Height="320"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner">
+    <StackPanel Margin="28" Spacing="12">
+        <TextBlock Text="{x:Static resources:Strings.BookShelf}"
+                   FontSize="24"
+                   FontWeight="SemiBold" />
+        <TextBlock Text="{x:Static resources:Strings.AboutVersion}"
+                   Classes="label" />
+        <TextBlock Text="{x:Static resources:Strings.AboutDescription}"
+                   TextWrapping="Wrap" />
+        <TextBlock Text="{x:Static resources:Strings.AboutTechnology}"
+                   Classes="label" />
+        <TextBlock Text="{x:Static resources:Strings.AboutCopyright}"
+                   Classes="label" />
+        <TextBlock Text="{x:Static resources:Strings.AboutLicense}"
+                   Classes="label" />
+        <Button Content="{x:Static resources:Strings.BuyMeACoffeeMessage}"
+                Click="BuyMeACoffee_OnClick"
+                HorizontalAlignment="Left" />
+        <Button Content="{x:Static resources:Strings.Close}"
+                Click="Close_OnClick"
+                HorizontalAlignment="Right" />
+    </StackPanel>
+</Window>
