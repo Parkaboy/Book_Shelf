@@ -158,6 +158,33 @@ public sealed class LibrarySyncService
         editedBook.CoverPath = book.CoverPath;
     }
 
+    public async Task DeleteBookAsync(Book bookToDelete, CancellationToken cancellationToken = default)
+    {
+        await using var database = contextFactory();
+        var book = await database.Books.SingleAsync(candidate => candidate.Id == bookToDelete.Id, cancellationToken);
+        coverService.Delete(book.CoverPath);
+        database.Books.Remove(book);
+        await database.SaveChangesAsync(cancellationToken);
+
+        if (File.Exists(book.FilePath))
+        {
+            File.Delete(book.FilePath);
+        }
+    }
+
+    public async Task ClearDatabaseAsync(CancellationToken cancellationToken = default)
+    {
+        await using var database = contextFactory();
+        var books = await database.Books.ToListAsync(cancellationToken);
+        foreach (var book in books)
+        {
+            coverService.Delete(book.CoverPath);
+        }
+
+        database.Books.RemoveRange(books);
+        await database.SaveChangesAsync(cancellationToken);
+    }
+
     private static async Task<string> ComputeHashAsync(string filePath, CancellationToken cancellationToken)
     {
         await using var stream = File.OpenRead(filePath);

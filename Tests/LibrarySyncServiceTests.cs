@@ -57,6 +57,30 @@ public sealed class LibrarySyncServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task SaveBookAsync_UpdatesExistingBookWithoutCreatingDuplicate()
+    {
+        var bookPath = Path.Combine(libraryFolder, "Dune.pdf");
+        await File.WriteAllTextAsync(bookPath, "pdf content");
+        var service = CreateService(strategies: new IBookCoverStrategy[]
+        {
+            new LocalBookCoverStrategy()
+        });
+
+        await service.SynchronizeAsync(libraryFolder);
+        var book = Assert.Single(await service.SearchAsync());
+        book.Title = "Updated Dune";
+        book.Author = "Frank Herbert";
+
+        await service.SaveBookAsync(book);
+
+        var books = await service.SearchAsync();
+        var savedBook = Assert.Single(books);
+        Assert.Equal(book.Id, savedBook.Id);
+        Assert.Equal("Updated Dune", savedBook.Title);
+        Assert.Equal("Frank Herbert", savedBook.Author);
+    }
+
+    [Fact]
     public async Task SynchronizeAsync_CachesMatchingLocalCover()
     {
         var bookPath = Path.Combine(libraryFolder, "Dune.pdf");
@@ -146,6 +170,54 @@ public sealed class LibrarySyncServiceTests : IDisposable
 
         Assert.Equal(1, changedBooks);
         Assert.Empty(await service.SearchAsync());
+    }
+
+    [Fact]
+    public async Task DeleteBookAsync_RemovesDatabaseEntryAndCachedCoverButKeepsBookFile()
+    {
+        var bookPath = Path.Combine(libraryFolder, "To remove.epub");
+        var coverPath = Path.Combine(libraryFolder, "cover.jpg");
+        await File.WriteAllTextAsync(bookPath, "epub content");
+        await File.WriteAllTextAsync(coverPath, "cover content");
+        var service = CreateService(strategies: new IBookCoverStrategy[]
+        {
+            new LocalBookCoverStrategy()
+        });
+
+        await service.SynchronizeAsync(libraryFolder);
+        var book = Assert.Single(await service.SearchAsync());
+        Assert.NotNull(book.CoverPath);
+        Assert.True(File.Exists(book.CoverPath));
+
+        await service.DeleteBookAsync(book);
+
+        Assert.Empty(await service.SearchAsync());
+        Assert.False(File.Exists(bookPath));
+        Assert.False(File.Exists(book.CoverPath));
+    }
+
+    [Fact]
+    public async Task ClearDatabaseAsync_RemovesRecordsAndCachedCoversButKeepsBookFiles()
+    {
+        var bookPath = Path.Combine(libraryFolder, "Keep me.epub");
+        var coverPath = Path.Combine(libraryFolder, "cover.jpg");
+        await File.WriteAllTextAsync(bookPath, "epub content");
+        await File.WriteAllTextAsync(coverPath, "cover content");
+        var service = CreateService(strategies: new IBookCoverStrategy[]
+        {
+            new LocalBookCoverStrategy()
+        });
+
+        await service.SynchronizeAsync(libraryFolder);
+        var book = Assert.Single(await service.SearchAsync());
+        Assert.NotNull(book.CoverPath);
+        Assert.True(File.Exists(book.CoverPath));
+
+        await service.ClearDatabaseAsync();
+
+        Assert.Empty(await service.SearchAsync());
+        Assert.True(File.Exists(bookPath));
+        Assert.False(File.Exists(book.CoverPath));
     }
 
     public void Dispose()

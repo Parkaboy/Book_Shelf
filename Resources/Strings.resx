@@ -22,9 +22,23 @@
   <data name="Library" xml:space="preserve"><value>Library</value></data>
   <data name="LibraryIsUpToDate" xml:space="preserve"><value>Library is up to date.</value></data>
   <data name="LibraryUpdatedFormat" xml:space="preserve"><value>Library updated: {0} change(s).</value></data>
+  <data name="OrderBy" xml:space="preserve"><value>Order by</value></data>
+  <data name="OrderByTitle" xml:space="preserve"><value>Title</value></data>
+  <data name="OrderByAuthor" xml:space="preserve"><value>Author</value></data>
+  <data name="OrderByDateAdded" xml:space="preserve"><value>Date added</value></data>
+  <data name="Filter" xml:space="preserve"><value>Filter</value></data>
+  <data name="FilterAll" xml:space="preserve"><value>All formats</value></data>
+  <data name="FilterEpub" xml:space="preserve"><value>EPUB</value></data>
+  <data name="FilterPdf" xml:space="preserve"><value>PDF</value></data>
   <data name="Light" xml:space="preserve"><value>Light</value></data>
   <data name="Dark" xml:space="preserve"><value>Dark</value></data>
   <data name="System" xml:space="preserve"><value>System</value></data>
+  <data name="Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="DeletedBookFormat" xml:space="preserve"><value>Removed {0} from the library.</value></data>
+  <data name="ExportDatabase" xml:space="preserve"><value>Export database...</value></data>
+  <data name="SQLiteDatabase" xml:space="preserve"><value>SQLite database</value></data>
+  <data name="CleanDatabase" xml:space="preserve"><value>Clean database data</value></data>
+  <data name="DatabaseCleaned" xml:space="preserve"><value>Database data cleaned.</value></data>
   <data name="NoLibraryFolderSelected" xml:space="preserve"><value>No library folder selected</value></data>
   <data name="Pages" xml:space="preserve"><value>Pages</value></data>
   <data name="PageCountFormat" xml:space="preserve"><value>{0} pages</value></data>
