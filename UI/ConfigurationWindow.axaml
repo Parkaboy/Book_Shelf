@@ -3,6 +3,7 @@
         xmlns:resources="using:Book_Shelf.Resources"
         xmlns:automation="using:Avalonia.Automation"
         x:Class="Book_Shelf.UI.ConfigurationWindow"
+        XYFocus.NavigationModes="Keyboard"
         Title="{x:Static resources:Strings.Configuration}"
         Width="420"
      Height="520"

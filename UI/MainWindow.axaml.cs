@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Input;
 using Avalonia.Platform.Storage;
 using Book_Shelf.Data;
 using Book_Shelf.Models;
@@ -74,6 +75,32 @@ public partial class MainWindow : Window
     }
 
     private void BookCard_DoubleTapped(object? sender, RoutedEventArgs e)
+    {
+        OpenBook(sender);
+    }
+
+    private void BookCard_GotFocus(object? sender, FocusChangedEventArgs e)
+    {
+        if (sender is Control { DataContext: Book book })
+        {
+            viewModel.SelectBook(book);
+        }
+    }
+
+    private void BookCard_KeyDown(object? sender, KeyEventArgs e)
+    {
+        if (sender is not Control card ||
+            !ReferenceEquals(e.Source, card) ||
+            e.Key is not (Key.Enter or Key.Space))
+        {
+            return;
+        }
+
+        OpenBook(card);
+        e.Handled = true;
+    }
+
+    private void OpenBook(object? sender)
     {
         if (sender is not Control { DataContext: Book book } || !File.Exists(book.FilePath))
         {

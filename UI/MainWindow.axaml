@@ -8,6 +8,7 @@
         xmlns:automation="using:Avalonia.Automation"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Book_Shelf.MainWindow"
+        XYFocus.NavigationModes="Keyboard"
         x:DataType="vm:LibraryViewModel"
         Title="{x:Static resources:Strings.BookShelf}"
         MinWidth="900"
@@ -142,6 +143,8 @@
                                     automation:AutomationProperties.HelpText="{Binding Author}"
                                     automation:AutomationProperties.ControlTypeOverride="Button"
                                         PointerPressed="BookCard_PointerPressed"
+                                        GotFocus="BookCard_GotFocus"
+                                        KeyDown="BookCard_KeyDown"
                                         DoubleTapped="BookCard_DoubleTapped">
                                     <StackPanel Spacing="10">
                                         <Border Classes="cover" Height="320">
