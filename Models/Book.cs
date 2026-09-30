@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.ComponentModel.DataAnnotations.Schema;
+using Avalonia.Media.Imaging;
 
 namespace Book_Shelf.Models;
 
@@ -10,6 +11,7 @@ public sealed class Book : INotifyPropertyChanged
     private bool isSelected;
     private bool isEditing;
     private string? coverPath;
+    private Bitmap? coverImage;
 
     public int Id { get; set; }
 
@@ -35,6 +37,23 @@ public sealed class Book : INotifyPropertyChanged
     {
         get => coverPath;
         set => SetField(ref coverPath, value);
+    }
+
+    [NotMapped]
+    public Bitmap? CoverImage
+    {
+        get => coverImage;
+        set
+        {
+            if (ReferenceEquals(coverImage, value))
+            {
+                return;
+            }
+
+            coverImage?.Dispose();
+            coverImage = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CoverImage)));
+        }
     }
 
     public DateTime ImportedUtc { get; set; }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Collections.Generic;
@@ -5,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Avalonia.Media.Imaging;
 using Book_Shelf.Data;
 using Book_Shelf.Models;
 using Book_Shelf.Resources;
@@ -215,9 +217,30 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
             _ => filteredBooks.OrderBy(book => book.Title)
         };
 
+        foreach (var existingBook in Books)
+        {
+            existingBook.CoverImage = null;
+        }
+
         Books.Clear();
         foreach (var book in filteredBooks)
         {
+            if (!string.IsNullOrWhiteSpace(book.CoverPath) && File.Exists(book.CoverPath))
+            {
+                try
+                {
+                    book.CoverImage = new Bitmap(book.CoverPath);
+                }
+                catch (IOException)
+                {
+                    book.CoverImage = null;
+                }
+                catch (ArgumentException)
+                {
+                    book.CoverImage = null;
+                }
+            }
+
             Books.Add(book);
         }
     }
