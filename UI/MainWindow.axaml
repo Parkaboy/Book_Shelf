@@ -3,7 +3,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="using:Book_Shelf.UI"
-        xmlns:models="using:Book_Shelf.Models"
         xmlns:resources="using:Book_Shelf.Resources"
         xmlns:automation="using:Avalonia.Automation"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
@@ -135,7 +134,7 @@
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
-                            <DataTemplate x:DataType="models:Book">
+                            <DataTemplate x:DataType="vm:BookItemViewModel">
                                 <Border Classes="book-card"
                                         Width="260"
                                         Tag="{Binding IsSelected}"

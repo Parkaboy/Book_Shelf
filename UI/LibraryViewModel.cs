@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Avalonia.Media.Imaging;
 using Book_Shelf.Data;
 using Book_Shelf.Models;
 using Book_Shelf.Resources;
@@ -14,7 +13,7 @@ using Book_Shelf.Services;
 
 namespace Book_Shelf.UI;
 
-public sealed class LibraryViewModel : INotifyPropertyChanged
+public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
 {
     private readonly LibrarySyncService syncService = new();
     private string? searchText;
@@ -24,7 +23,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
     private string statusMessage = Strings.ChooseLibraryFolderToBegin;
     private bool isBusy;
 
-    public ObservableCollection<Book> Books { get; } = new();
+    public ObservableCollection<BookItemViewModel> Books { get; } = new();
 
     public int TotalBookCount { get; private set; }
 
@@ -163,12 +162,12 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
         }
     }
 
-    public void BeginEditing(Book book)
+    public void BeginEditing(BookItemViewModel book)
     {
         book.IsEditing = true;
     }
 
-    public void SelectBook(Book selectedBook)
+    public void SelectBook(BookItemViewModel selectedBook)
     {
         foreach (var book in Books)
         {
@@ -176,16 +175,17 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
         }
     }
 
-    public async Task SaveBookAsync(Book book)
+    public async Task SaveBookAsync(BookItemViewModel book)
     {
-        await syncService.SaveBookAsync(book);
+        await syncService.SaveBookAsync(book.Book);
         book.IsEditing = false;
+        book.ReloadCoverImage();
         StatusMessage = string.Format(Strings.UpdatedBookFormat, book.Title);
     }
 
-    public async Task DeleteBookAsync(Book book)
+    public async Task DeleteBookAsync(BookItemViewModel book)
     {
-        await syncService.DeleteBookAsync(book);
+        await syncService.DeleteBookAsync(book.Book);
         await LoadBooksAsync();
         StatusMessage = string.Format(Strings.DeletedBookFormat, book.Title);
     }
@@ -217,32 +217,24 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
             _ => filteredBooks.OrderBy(book => book.Title)
         };
 
-        foreach (var existingBook in Books)
+        ClearBooks();
+
+        foreach (var book in filteredBooks)
         {
-            existingBook.CoverImage = null;
+            Books.Add(new BookItemViewModel(book));
+        }
+    }
+
+    public void Dispose() => ClearBooks();
+
+    private void ClearBooks()
+    {
+        foreach (var book in Books)
+        {
+            book.Dispose();
         }
 
         Books.Clear();
-        foreach (var book in filteredBooks)
-        {
-            if (!string.IsNullOrWhiteSpace(book.CoverPath) && File.Exists(book.CoverPath))
-            {
-                try
-                {
-                    book.CoverImage = new Bitmap(book.CoverPath);
-                }
-                catch (IOException)
-                {
-                    book.CoverImage = null;
-                }
-                catch (ArgumentException)
-                {
-                    book.CoverImage = null;
-                }
-            }
-
-            Books.Add(book);
-        }
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
