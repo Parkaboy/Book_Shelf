@@ -19,7 +19,10 @@ public sealed class LibrarySyncService
     private static readonly HashSet<string> SupportedExtensions = new(StringComparer.OrdinalIgnoreCase)
     {
         ".epub",
-        ".pdf"
+        ".pdf",
+        ".mobi",
+        ".rtf",
+        ".txt"
     };
 
     public LibrarySyncService()

@@ -39,7 +39,10 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
     [
         Strings.FilterAll,
         Strings.FilterEpub,
-        Strings.FilterPdf
+        Strings.FilterPdf,
+        Strings.FilterMobi,
+        Strings.FilterRtf,
+        Strings.FilterTxt
     ];
 
     public string? SearchText
@@ -207,6 +210,9 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
         {
             var filter when filter == Strings.FilterEpub => books.Where(book => book.Format == "EPUB"),
             var filter when filter == Strings.FilterPdf => books.Where(book => book.Format == "PDF"),
+            var filter when filter == Strings.FilterMobi => books.Where(book => book.Format == "MOBI"),
+            var filter when filter == Strings.FilterRtf => books.Where(book => book.Format == "RTF"),
+            var filter when filter == Strings.FilterTxt => books.Where(book => book.Format == "TXT"),
             _ => books
         };
 
