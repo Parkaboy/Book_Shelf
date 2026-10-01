@@ -42,6 +42,22 @@ public sealed class LibrarySyncServiceTests : IDisposable
         Assert.Equal("EPUB", book.Format);
     }
 
+    [Theory]
+    [InlineData(".mobi", "MOBI")]
+    [InlineData(".rtf", "RTF")]
+    [InlineData(".txt", "TXT")]
+    public async Task SynchronizeAsync_ImportsAdditionalFormats(string extension, string expectedFormat)
+    {
+        await File.WriteAllTextAsync(Path.Combine(libraryFolder, "New format" + extension), "book content");
+        var service = CreateService(strategies: Array.Empty<IBookCoverStrategy>());
+
+        var changedBooks = await service.SynchronizeAsync(libraryFolder);
+        var book = Assert.Single(await service.SearchAsync());
+
+        Assert.Equal(1, changedBooks);
+        Assert.Equal(expectedFormat, book.Format);
+    }
+
     [Fact]
     public async Task SearchAsync_IsCaseInsensitive()
     {

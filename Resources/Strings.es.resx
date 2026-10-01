@@ -4,7 +4,7 @@
   <resheader name="version"><value>2.0</value></resheader>
   <data name="AboutBookShelf"><value>Acerca de Book Shelf</value></data>
   <data name="AboutCopyright"><value>© 2026 Martín De León</value></data>
-  <data name="AboutDescription"><value>Organiza, explora y edita los metadatos de tu biblioteca EPUB y PDF.</value></data>
+  <data name="AboutDescription"><value>Organiza, explora y edita los metadatos de libros en formato EPUB, PDF, MOBI, RTF y TXT.</value></data>
   <data name="AboutLicense"><value>Publicado bajo la licencia MIT.</value></data>
   <data name="AboutTechnology"><value>Creado con .NET y Avalonia UI.</value></data>
   <data name="AboutVersion"><value>Versión 1.0.0</value></data>
@@ -37,6 +37,9 @@
   <data name="FilterAll"><value>Todos los formatos</value></data>
   <data name="FilterEpub"><value>EPUB</value></data>
   <data name="FilterPdf"><value>PDF</value></data>
+  <data name="FilterMobi"><value>MOBI</value></data>
+  <data name="FilterRtf"><value>RTF</value></data>
+  <data name="FilterTxt"><value>TXT</value></data>
   <data name="Light"><value>Claro</value></data>
   <data name="Dark"><value>Oscuro</value></data>
   <data name="System"><value>Sistema</value></data>
