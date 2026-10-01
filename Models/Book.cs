@@ -1,16 +1,9 @@
 using System;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Book_Shelf.Models;
 
-public sealed class Book : INotifyPropertyChanged
+public sealed class Book
 {
-    private bool isSelected;
-    private bool isEditing;
-    private string? coverPath;
-
     public int Id { get; set; }
 
     public required string Title { get; set; }
@@ -31,40 +24,9 @@ public sealed class Book : INotifyPropertyChanged
 
     public required string ContentHash { get; set; }
 
-    public string? CoverPath
-    {
-        get => coverPath;
-        set => SetField(ref coverPath, value);
-    }
+    public string? CoverPath { get; set; }
 
     public DateTime ImportedUtc { get; set; }
 
     public DateTime UpdatedUtc { get; set; }
-
-    [NotMapped]
-    public bool IsSelected
-    {
-        get => isSelected;
-        set => SetField(ref isSelected, value);
-    }
-
-    [NotMapped]
-    public bool IsEditing
-    {
-        get => isEditing;
-        set => SetField(ref isEditing, value);
-    }
-
-    public event PropertyChangedEventHandler? PropertyChanged;
-
-    private void SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
-    {
-        if (Equals(field, value))
-        {
-            return;
-        }
-
-        field = value;
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ using Book_Shelf.Services;
 
 namespace Book_Shelf.UI;
 
-public sealed class LibraryViewModel : INotifyPropertyChanged
+public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
 {
     private readonly LibrarySyncService syncService = new();
     private string? searchText;
@@ -22,7 +23,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
     private string statusMessage = Strings.ChooseLibraryFolderToBegin;
     private bool isBusy;
 
-    public ObservableCollection<Book> Books { get; } = new();
+    public ObservableCollection<BookItemViewModel> Books { get; } = new();
 
     public int TotalBookCount { get; private set; }
 
@@ -161,12 +162,12 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
         }
     }
 
-    public void BeginEditing(Book book)
+    public void BeginEditing(BookItemViewModel book)
     {
         book.IsEditing = true;
     }
 
-    public void SelectBook(Book selectedBook)
+    public void SelectBook(BookItemViewModel selectedBook)
     {
         foreach (var book in Books)
         {
@@ -174,16 +175,17 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
         }
     }
 
-    public async Task SaveBookAsync(Book book)
+    public async Task SaveBookAsync(BookItemViewModel book)
     {
-        await syncService.SaveBookAsync(book);
+        await syncService.SaveBookAsync(book.Book);
         book.IsEditing = false;
+        book.ReloadCoverImage();
         StatusMessage = string.Format(Strings.UpdatedBookFormat, book.Title);
     }
 
-    public async Task DeleteBookAsync(Book book)
+    public async Task DeleteBookAsync(BookItemViewModel book)
     {
-        await syncService.DeleteBookAsync(book);
+        await syncService.DeleteBookAsync(book.Book);
         await LoadBooksAsync();
         StatusMessage = string.Format(Strings.DeletedBookFormat, book.Title);
     }
@@ -215,11 +217,24 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
             _ => filteredBooks.OrderBy(book => book.Title)
         };
 
-        Books.Clear();
+        ClearBooks();
+
         foreach (var book in filteredBooks)
         {
-            Books.Add(book);
+            Books.Add(new BookItemViewModel(book));
         }
+    }
+
+    public void Dispose() => ClearBooks();
+
+    private void ClearBooks()
+    {
+        foreach (var book in Books)
+        {
+            book.Dispose();
+        }
+
+        Books.Clear();
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
