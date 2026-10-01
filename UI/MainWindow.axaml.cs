@@ -6,7 +6,6 @@ using Avalonia.Interactivity;
 using Avalonia.Input;
 using Avalonia.Platform.Storage;
 using Book_Shelf.Data;
-using Book_Shelf.Models;
 using Book_Shelf.Resources;
 using Book_Shelf.UI;
 
@@ -21,6 +20,7 @@ public partial class MainWindow : Window
         InitializeComponent();
         DataContext = viewModel;
         Opened += OnOpened;
+        Closed += (_, _) => viewModel.Dispose();
     }
 
     private async void OnOpened(object? sender, EventArgs e)
@@ -81,7 +81,7 @@ public partial class MainWindow : Window
 
     private void BookCard_GotFocus(object? sender, FocusChangedEventArgs e)
     {
-        if (sender is Control { DataContext: Book book })
+        if (sender is Control { DataContext: BookItemViewModel book })
         {
             viewModel.SelectBook(book);
         }
@@ -102,7 +102,7 @@ public partial class MainWindow : Window
 
     private void OpenBook(object? sender)
     {
-        if (sender is not Control { DataContext: Book book } || !File.Exists(book.FilePath))
+        if (sender is not Control { DataContext: BookItemViewModel book } || !File.Exists(book.FilePath))
         {
             return;
         }
@@ -116,7 +116,7 @@ public partial class MainWindow : Window
 
     private void BookCard_PointerPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
     {
-        if (sender is Control card && card.DataContext is Book book)
+        if (sender is Control card && card.DataContext is BookItemViewModel book)
         {
             card.Focus();
             viewModel.SelectBook(book);
@@ -125,7 +125,7 @@ public partial class MainWindow : Window
 
     private void EditBook_OnClick(object? sender, RoutedEventArgs e)
     {
-        if (sender is Control { DataContext: Book book })
+        if (sender is Control { DataContext: BookItemViewModel book })
         {
             viewModel.BeginEditing(book);
         }
@@ -133,7 +133,7 @@ public partial class MainWindow : Window
 
     private async void SaveBook_OnClick(object? sender, RoutedEventArgs e)
     {
-        if (sender is Control { DataContext: Book book })
+        if (sender is Control { DataContext: BookItemViewModel book })
         {
             await viewModel.SaveBookAsync(book);
         }
@@ -141,7 +141,7 @@ public partial class MainWindow : Window
 
     private async void DeleteBook_OnClick(object? sender, RoutedEventArgs e)
     {
-        if (sender is Control { DataContext: Book book })
+        if (sender is Control { DataContext: BookItemViewModel book })
         {
             await viewModel.DeleteBookAsync(book);
         }
