@@ -4,7 +4,7 @@
   <resheader name="version"><value>2.0</value></resheader>
   <data name="AboutBookShelf"><value>Sobre o Book Shelf</value></data>
   <data name="AboutCopyright"><value>© 2026 Martín De León</value></data>
-  <data name="AboutDescription"><value>Organize, navegue e edite os metadados da sua biblioteca EPUB e PDF.</value></data>
+  <data name="AboutDescription"><value>Organize, navegue e edite metadados de livros nos formatos EPUB, PDF, MOBI, RTF e TXT.</value></data>
   <data name="AboutLicense"><value>Distribuído sob a licença MIT.</value></data>
   <data name="AboutTechnology"><value>Desenvolvido com .NET e Avalonia UI.</value></data>
   <data name="AboutVersion"><value>Versão 1.0.0</value></data>
@@ -37,6 +37,9 @@
   <data name="FilterAll"><value>Todos os formatos</value></data>
   <data name="FilterEpub"><value>EPUB</value></data>
   <data name="FilterPdf"><value>PDF</value></data>
+  <data name="FilterMobi"><value>MOBI</value></data>
+  <data name="FilterRtf"><value>RTF</value></data>
+  <data name="FilterTxt"><value>TXT</value></data>
   <data name="Light"><value>Claro</value></data>
   <data name="Dark"><value>Escuro</value></data>
   <data name="System"><value>Sistema</value></data>
@@ -61,6 +64,7 @@
   <data name="Help"><value>Ajuda</value></data>
   <data name="ViewErrorLogs"><value>Ver logs de erro</value></data>
   <data name="ErrorLogNotFound"><value>Nenhum log de erro foi criado ainda.</value></data>
+  <data name="LibraryInitializationFailed"><value>Não foi possível inicializar a biblioteca. Consulte Ajuda &gt; Ver logs de erro.</value></data>
   <data name="BookShelf"><value>Book Shelf</value></data>
   <data name="BuyMeACoffeeMessage"><value>Gostando do Book Shelf? Pague-me um café</value></data>
   <data name="BuyMeACoffeeUrl"><value>https://www.buymeacoffee.com/parkaboy</value></data>

@@ -54,6 +54,9 @@ public static class Strings
     public static string FilterAll => GetString(nameof(FilterAll));
     public static string FilterEpub => GetString(nameof(FilterEpub));
     public static string FilterPdf => GetString(nameof(FilterPdf));
+    public static string FilterMobi => GetString(nameof(FilterMobi));
+    public static string FilterRtf => GetString(nameof(FilterRtf));
+    public static string FilterTxt => GetString(nameof(FilterTxt));
     public static string Light => GetString(nameof(Light));
     public static string Dark => GetString(nameof(Dark));
     public static string System => GetString(nameof(System));
@@ -78,6 +81,7 @@ public static class Strings
     public static string Help => GetString(nameof(Help));
     public static string ViewErrorLogs => GetString(nameof(ViewErrorLogs));
     public static string ErrorLogNotFound => GetString(nameof(ErrorLogNotFound));
+    public static string LibraryInitializationFailed => GetString(nameof(LibraryInitializationFailed));
     public static string YourLibrary => GetString(nameof(YourLibrary));
 
     private static string GetString(string name) => resourceManager.GetString(name, Culture) ?? name;

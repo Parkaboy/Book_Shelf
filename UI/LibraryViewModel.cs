@@ -10,6 +10,7 @@ using Book_Shelf.Data;
 using Book_Shelf.Models;
 using Book_Shelf.Resources;
 using Book_Shelf.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace Book_Shelf.UI;
 
@@ -38,7 +39,10 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
     [
         Strings.FilterAll,
         Strings.FilterEpub,
-        Strings.FilterPdf
+        Strings.FilterPdf,
+        Strings.FilterMobi,
+        Strings.FilterRtf,
+        Strings.FilterTxt
     ];
 
     public string? SearchText
@@ -111,6 +115,11 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
 
     public async Task InitializeAsync()
     {
+        await using (var database = LibraryDbContext.Create())
+        {
+            await database.Database.MigrateAsync();
+        }
+
         var settings = await new LibrarySettingsStore().LoadAsync();
         if (string.IsNullOrWhiteSpace(settings.LibraryFolderPath))
         {
@@ -207,6 +216,9 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
         {
             var filter when filter == Strings.FilterEpub => books.Where(book => book.Format == "EPUB"),
             var filter when filter == Strings.FilterPdf => books.Where(book => book.Format == "PDF"),
+            var filter when filter == Strings.FilterMobi => books.Where(book => book.Format == "MOBI"),
+            var filter when filter == Strings.FilterRtf => books.Where(book => book.Format == "RTF"),
+            var filter when filter == Strings.FilterTxt => books.Where(book => book.Format == "TXT"),
             _ => books
         };
 
