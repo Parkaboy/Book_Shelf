@@ -55,7 +55,7 @@ public sealed class LibrarySyncService
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         await using var database = contextFactory();
-        await database.Database.MigrateAsync(cancellationToken);
+    //    await database.Database.MigrateAsync(cancellationToken);
 
         var folderPrefix = fullFolderPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
             + Path.DirectorySeparatorChar;

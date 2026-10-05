@@ -17,6 +17,8 @@ namespace Book_Shelf.UI;
 public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
 {
     private readonly LibrarySyncService syncService = new();
+    private readonly List<BookItemViewModel> allBooks = new();
+    private BookItemViewModel? selectedBook;
     private string? searchText;
     private string selectedOrder = Strings.OrderByTitle;
     private string selectedFilter = Strings.FilterAll;
@@ -57,7 +59,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
 
             searchText = value;
             OnPropertyChanged();
-            _ = LoadBooksAsync();
+            ApplyBookView();
         }
     }
 
@@ -73,7 +75,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
 
             selectedOrder = value;
             OnPropertyChanged();
-            _ = LoadBooksAsync();
+            ApplyBookView();
         }
     }
 
@@ -89,7 +91,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
 
             selectedFilter = value;
             OnPropertyChanged();
-            _ = LoadBooksAsync();
+            ApplyBookView();
         }
     }
 
@@ -178,10 +180,18 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
 
     public void SelectBook(BookItemViewModel selectedBook)
     {
-        foreach (var book in Books)
+        if (ReferenceEquals(this.selectedBook, selectedBook))
         {
-            book.IsSelected = ReferenceEquals(book, selectedBook);
+            return;
         }
+
+        if (this.selectedBook is not null)
+        {
+            this.selectedBook.IsSelected = false;
+        }
+
+        this.selectedBook = selectedBook;
+        selectedBook.IsSelected = true;
     }
 
     public async Task SaveBookAsync(BookItemViewModel book)
@@ -189,6 +199,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
         await syncService.SaveBookAsync(book.Book);
         book.IsEditing = false;
         book.ReloadCoverImage();
+        ApplyBookView();
         StatusMessage = string.Format(Strings.UpdatedBookFormat, book.Title);
     }
 
@@ -208,44 +219,88 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
 
     private async Task LoadBooksAsync()
     {
-        var books = await syncService.SearchAsync(SearchText);
-        TotalBookCount = string.IsNullOrWhiteSpace(SearchText)
-            ? books.Count
-            : (await syncService.SearchAsync()).Count;
-        IEnumerable<Book> filteredBooks = SelectedFilter switch
+        var books = await syncService.SearchAsync();
+        TotalBookCount = books.Count;
+
+        foreach (var book in allBooks)
         {
-            var filter when filter == Strings.FilterEpub => books.Where(book => book.Format == "EPUB"),
-            var filter when filter == Strings.FilterPdf => books.Where(book => book.Format == "PDF"),
-            var filter when filter == Strings.FilterMobi => books.Where(book => book.Format == "MOBI"),
-            var filter when filter == Strings.FilterRtf => books.Where(book => book.Format == "RTF"),
-            var filter when filter == Strings.FilterTxt => books.Where(book => book.Format == "TXT"),
-            _ => books
+            book.Dispose();
+        }
+
+        allBooks.Clear();
+        allBooks.AddRange(books.Select(book => new BookItemViewModel(book)));
+        selectedBook = null;
+        ApplyBookView();
+    }
+
+    private void ApplyBookView()
+    {
+        IEnumerable<BookItemViewModel> filteredBooks = allBooks;
+        var search = SearchText?.Trim();
+        if (!string.IsNullOrEmpty(search))
+        {
+            filteredBooks = filteredBooks.Where(book =>
+                book.Title.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                (book.Author?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (book.Isbn?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false));
+        }
+
+        filteredBooks = SelectedFilter switch
+        {
+            var filter when filter == Strings.FilterEpub => filteredBooks.Where(book => book.Format == "EPUB"),
+            var filter when filter == Strings.FilterPdf => filteredBooks.Where(book => book.Format == "PDF"),
+            var filter when filter == Strings.FilterMobi => filteredBooks.Where(book => book.Format == "MOBI"),
+            var filter when filter == Strings.FilterRtf => filteredBooks.Where(book => book.Format == "RTF"),
+            var filter when filter == Strings.FilterTxt => filteredBooks.Where(book => book.Format == "TXT"),
+            _ => filteredBooks
         };
 
         filteredBooks = SelectedOrder switch
         {
             var order when order == Strings.OrderByAuthor => filteredBooks.OrderBy(book => book.Author ?? book.Title),
-            var order when order == Strings.OrderByDateAdded => filteredBooks.OrderByDescending(book => book.ImportedUtc),
+            var order when order == Strings.OrderByDateAdded => filteredBooks.OrderByDescending(book => book.Book.ImportedUtc),
             _ => filteredBooks.OrderBy(book => book.Title)
         };
 
-        ClearBooks();
+        var desiredBooks = filteredBooks.ToList();
+        var visibleBooks = desiredBooks.ToHashSet();
 
-        foreach (var book in filteredBooks)
+        for (var index = Books.Count - 1; index >= 0; index--)
         {
-            Books.Add(new BookItemViewModel(book));
+            if (!visibleBooks.Contains(Books[index]))
+            {
+                if (ReferenceEquals(selectedBook, Books[index]))
+                {
+                    selectedBook.IsSelected = false;
+                    selectedBook = null;
+                }
+
+                Books.RemoveAt(index);
+            }
+        }
+
+        for (var targetIndex = 0; targetIndex < desiredBooks.Count; targetIndex++)
+        {
+            var currentIndex = Books.IndexOf(desiredBooks[targetIndex]);
+            if (currentIndex < 0)
+            {
+                Books.Insert(targetIndex, desiredBooks[targetIndex]);
+            }
+            else if (currentIndex != targetIndex)
+            {
+                Books.Move(currentIndex, targetIndex);
+            }
         }
     }
 
-    public void Dispose() => ClearBooks();
-
-    private void ClearBooks()
+    public void Dispose()
     {
-        foreach (var book in Books)
+        foreach (var book in allBooks)
         {
             book.Dispose();
         }
 
+        allBooks.Clear();
         Books.Clear();
     }
 

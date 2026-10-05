@@ -123,7 +123,8 @@ public sealed class BookItemViewModel : INotifyPropertyChanged, IDisposable
 
         try
         {
-            CoverImage = new Bitmap(Book.CoverPath);
+            using var coverStream = File.OpenRead(Book.CoverPath);
+            CoverImage = Bitmap.DecodeToWidth(coverStream, 480, BitmapInterpolationMode.HighQuality);
         }
         catch (IOException)
         {

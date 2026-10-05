@@ -34,12 +34,11 @@ public sealed class BookCoverService
     public BookCoverService(string cacheDirectory, HttpClient httpClient)
         : this(
             cacheDirectory,
-            new IBookCoverStrategy[]
-            {
+            [
                 new LocalBookCoverStrategy(),
                 new EmbeddedEpubCoverStrategy(),
                 new GoogleBooksCoverStrategy(httpClient)
-            })
+            ])
     {
     }
 
