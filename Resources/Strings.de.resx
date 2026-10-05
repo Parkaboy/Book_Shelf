@@ -64,6 +64,7 @@
   <data name="Help"><value>Hilfe</value></data>
   <data name="ViewErrorLogs"><value>Fehlerprotokolle anzeigen</value></data>
   <data name="ErrorLogNotFound"><value>Es wurde noch kein Fehlerprotokoll erstellt.</value></data>
+  <data name="LibraryInitializationFailed"><value>Die Bibliothek konnte nicht initialisiert werden. Prüfen Sie Hilfe &gt; Fehlerprotokolle anzeigen.</value></data>
   <data name="BookShelf"><value>Book Shelf</value></data>
   <data name="BuyMeACoffeeMessage"><value>Gefällt Ihnen Book Shelf? Laden Sie mich auf einen Kaffee ein</value></data>
   <data name="BuyMeACoffeeUrl"><value>https://www.buymeacoffee.com/parkaboy</value></data>

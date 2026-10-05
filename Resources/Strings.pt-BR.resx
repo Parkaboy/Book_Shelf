@@ -64,6 +64,7 @@
   <data name="Help"><value>Ajuda</value></data>
   <data name="ViewErrorLogs"><value>Ver logs de erro</value></data>
   <data name="ErrorLogNotFound"><value>Nenhum log de erro foi criado ainda.</value></data>
+  <data name="LibraryInitializationFailed"><value>Não foi possível inicializar a biblioteca. Consulte Ajuda &gt; Ver logs de erro.</value></data>
   <data name="BookShelf"><value>Book Shelf</value></data>
   <data name="BuyMeACoffeeMessage"><value>Gostando do Book Shelf? Pague-me um café</value></data>
   <data name="BuyMeACoffeeUrl"><value>https://www.buymeacoffee.com/parkaboy</value></data>

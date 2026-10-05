@@ -31,6 +31,17 @@ public sealed class LibrarySettingsStore
             ?? new LibrarySettings();
     }
 
+    public LibrarySettings Load()
+    {
+        if (!File.Exists(settingsPath))
+        {
+            return new LibrarySettings();
+        }
+
+        return JsonSerializer.Deserialize<LibrarySettings>(File.ReadAllText(settingsPath))
+            ?? new LibrarySettings();
+    }
+
     public async Task SaveAsync(LibrarySettings settings, CancellationToken cancellationToken = default)
     {
         await using var stream = File.Create(settingsPath);

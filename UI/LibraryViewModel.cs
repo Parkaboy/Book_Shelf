@@ -10,6 +10,7 @@ using Book_Shelf.Data;
 using Book_Shelf.Models;
 using Book_Shelf.Resources;
 using Book_Shelf.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace Book_Shelf.UI;
 
@@ -114,6 +115,11 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
 
     public async Task InitializeAsync()
     {
+        await using (var database = LibraryDbContext.Create())
+        {
+            await database.Database.MigrateAsync();
+        }
+
         var settings = await new LibrarySettingsStore().LoadAsync();
         if (string.IsNullOrWhiteSpace(settings.LibraryFolderPath))
         {

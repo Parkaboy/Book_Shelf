@@ -8,6 +8,7 @@ using Avalonia.Platform.Storage;
 using Book_Shelf.Data;
 using Book_Shelf.Resources;
 using Book_Shelf.UI;
+using Serilog;
 
 namespace Book_Shelf;
 
@@ -26,7 +27,15 @@ public partial class MainWindow : Window
     private async void OnOpened(object? sender, EventArgs e)
     {
         Opened -= OnOpened;
-        await viewModel.InitializeAsync();
+        try
+        {
+            await viewModel.InitializeAsync();
+        }
+        catch (Exception exception)
+        {
+            Log.Error(exception, "Failed to initialize the library");
+            viewModel.SetStatusMessage(Strings.LibraryInitializationFailed);
+        }
     }
 
     private async void ChooseFolder_OnClick(object? sender, RoutedEventArgs e)

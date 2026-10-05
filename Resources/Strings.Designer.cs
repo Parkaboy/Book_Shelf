@@ -81,6 +81,7 @@ public static class Strings
     public static string Help => GetString(nameof(Help));
     public static string ViewErrorLogs => GetString(nameof(ViewErrorLogs));
     public static string ErrorLogNotFound => GetString(nameof(ErrorLogNotFound));
+    public static string LibraryInitializationFailed => GetString(nameof(LibraryInitializationFailed));
     public static string YourLibrary => GetString(nameof(YourLibrary));
 
     private static string GetString(string name) => resourceManager.GetString(name, Culture) ?? name;

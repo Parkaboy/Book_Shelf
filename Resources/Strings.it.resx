@@ -64,6 +64,7 @@
   <data name="Help"><value>Guida</value></data>
   <data name="ViewErrorLogs"><value>Visualizza i log degli errori</value></data>
   <data name="ErrorLogNotFound"><value>Non è ancora stato creato alcun log degli errori.</value></data>
+  <data name="LibraryInitializationFailed"><value>Impossibile inizializzare la raccolta. Controlla Guida &gt; Visualizza i log degli errori.</value></data>
   <data name="BookShelf"><value>Book Shelf</value></data>
   <data name="BuyMeACoffeeMessage"><value>Ti piace Book Shelf? Offrimi un caffè</value></data>
   <data name="BuyMeACoffeeUrl"><value>https://www.buymeacoffee.com/parkaboy</value></data>
