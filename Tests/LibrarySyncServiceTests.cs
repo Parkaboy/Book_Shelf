@@ -13,12 +13,14 @@ using Xunit;
 
 namespace Book_Shelf.Tests;
 
+/// <summary>Verifies library synchronization, book management, and cover resolution behavior.</summary>
 public sealed class LibrarySyncServiceTests : IDisposable
 {
     private readonly string testRoot = Path.Combine(Path.GetTempPath(), "BookShelfTests", Guid.NewGuid().ToString("N"));
     private readonly string libraryFolder;
     private readonly string databasePath;
 
+    /// <summary>Creates a unique temporary library folder and database for each test.</summary>
     public LibrarySyncServiceTests()
     {
         libraryFolder = Path.Combine(testRoot, "Library");
@@ -26,6 +28,7 @@ public sealed class LibrarySyncServiceTests : IDisposable
         Directory.CreateDirectory(libraryFolder);
     }
 
+    /// <summary>Verifies synchronization imports supported book files and ignores unrelated files.</summary>
     [Fact]
     public async Task SynchronizeAsync_ImportsSupportedBookFiles()
     {
@@ -42,6 +45,7 @@ public sealed class LibrarySyncServiceTests : IDisposable
         Assert.Equal("EPUB", book.Format);
     }
 
+    /// <summary>Verifies synchronization imports each additional supported file format.</summary>
     [Theory]
     [InlineData(".mobi", "MOBI")]
     [InlineData(".rtf", "RTF")]
@@ -58,6 +62,7 @@ public sealed class LibrarySyncServiceTests : IDisposable
         Assert.Equal(expectedFormat, book.Format);
     }
 
+    /// <summary>Verifies catalog search matches book titles without case sensitivity.</summary>
     [Fact]
     public async Task SearchAsync_IsCaseInsensitive()
     {
@@ -72,6 +77,7 @@ public sealed class LibrarySyncServiceTests : IDisposable
         Assert.Equal("Hask", books[0].Title);
     }
 
+    /// <summary>Verifies repeating an unchanged scan does not create duplicate records.</summary>
     [Fact]
     public async Task SynchronizeAsync_DoesNotDuplicateUnchangedBooks()
     {
@@ -86,6 +92,7 @@ public sealed class LibrarySyncServiceTests : IDisposable
         Assert.Single(books);
     }
 
+    /// <summary>Verifies edited metadata updates its existing database record.</summary>
     [Fact]
     public async Task SaveBookAsync_UpdatesExistingBookWithoutCreatingDuplicate()
     {
@@ -110,6 +117,7 @@ public sealed class LibrarySyncServiceTests : IDisposable
         Assert.Equal("Frank Herbert", savedBook.Author);
     }
 
+    /// <summary>Verifies synchronization finds and caches a cover matching the book filename.</summary>
     [Fact]
     public async Task SynchronizeAsync_CachesMatchingLocalCover()
     {
@@ -128,6 +136,7 @@ public sealed class LibrarySyncServiceTests : IDisposable
         Assert.NotEqual(coverPath, book.CoverPath);
     }
 
+    /// <summary>Verifies the only image in a book directory is selected as its cover.</summary>
     [Fact]
     public async Task SynchronizeAsync_UsesTheOnlyImageInBookDirectory()
     {
@@ -147,6 +156,7 @@ public sealed class LibrarySyncServiceTests : IDisposable
         Assert.Equal("cover content", await File.ReadAllTextAsync(book.CoverPath));
     }
 
+    /// <summary>Verifies a later scan finds a cover added after the book was imported.</summary>
     [Fact]
     public async Task SynchronizeAsync_FindsCoverAddedAfterBookWasImported()
     {
@@ -167,6 +177,7 @@ public sealed class LibrarySyncServiceTests : IDisposable
         Assert.Equal("cover content", await File.ReadAllTextAsync(book.CoverPath));
     }
 
+    /// <summary>Verifies an ISBN edit can resolve and cache a cover from Google Books.</summary>
     [Fact]
     public async Task SynchronizeAsync_UsesGoogleBooksCoverByIsbn()
     {
@@ -187,6 +198,7 @@ public sealed class LibrarySyncServiceTests : IDisposable
         Assert.Contains("9780441172719", handler.LastRequestUri);
     }
 
+    /// <summary>Verifies synchronization removes records for supported files deleted from the folder.</summary>
     [Fact]
     public async Task SynchronizeAsync_RemovesBooksDeletedFromFolder()
     {
@@ -202,6 +214,7 @@ public sealed class LibrarySyncServiceTests : IDisposable
         Assert.Empty(await service.SearchAsync());
     }
 
+    /// <summary>Verifies deleting a book removes its record and cover as well as its source file.</summary>
     [Fact]
     public async Task DeleteBookAsync_RemovesDatabaseEntryAndCachedCoverButKeepsBookFile()
     {
@@ -226,6 +239,7 @@ public sealed class LibrarySyncServiceTests : IDisposable
         Assert.False(File.Exists(book.CoverPath));
     }
 
+    /// <summary>Verifies clearing the catalog removes records and covers but retains source files.</summary>
     [Fact]
     public async Task ClearDatabaseAsync_RemovesRecordsAndCachedCoversButKeepsBookFiles()
     {
@@ -250,6 +264,7 @@ public sealed class LibrarySyncServiceTests : IDisposable
         Assert.False(File.Exists(book.CoverPath));
     }
 
+    /// <summary>Removes the temporary files and database created for the current test.</summary>
     public void Dispose()
     {
         if (Directory.Exists(testRoot))
@@ -258,6 +273,7 @@ public sealed class LibrarySyncServiceTests : IDisposable
         }
     }
 
+    /// <summary>Builds a sync service connected to this test's isolated database and cover cache.</summary>
     private LibrarySyncService CreateService(
         HttpMessageHandler? handler = null,
         IReadOnlyList<IBookCoverStrategy>? strategies = null)
@@ -274,10 +290,12 @@ public sealed class LibrarySyncServiceTests : IDisposable
             : new BookCoverService(Path.Combine(testRoot, "covers"), strategies));
     }
 
+    /// <summary>Returns deterministic Google Books API and image responses for cover tests.</summary>
     private sealed class GoogleBooksHandler : HttpMessageHandler
     {
         public string? LastRequestUri { get; private set; }
 
+        /// <summary>Records API queries and returns stubbed metadata or cover image responses.</summary>
         protected override Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request,
             System.Threading.CancellationToken cancellationToken)

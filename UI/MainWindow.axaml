@@ -9,6 +9,7 @@
         x:Class="Book_Shelf.MainWindow"
         XYFocus.NavigationModes="Keyboard"
         x:DataType="vm:LibraryViewModel"
+        Icon="/Assets/bookshelf.ico"
         Title="{x:Static resources:Strings.BookShelf}"
         MinWidth="900"
         MinHeight="600">
@@ -68,7 +69,34 @@
         </Style>
     </Window.Styles>
 
-    <DockPanel Background="{DynamicResource LibraryBackgroundColor}">
+    <Grid Background="{DynamicResource LibraryBackgroundColor}">
+        <Border x:Name="SplashScreen" Background="{DynamicResource LibraryBackgroundColor}">
+            <StackPanel HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Spacing="20">
+                <Image Source="/Assets/bookshelf.png"
+                       Width="64"
+                       Height="64"
+                       Stretch="Uniform" />
+                <StackPanel Spacing="8">
+                    <TextBlock Text="{x:Static resources:Strings.BookShelf}"
+                               HorizontalAlignment="Center"
+                               FontSize="30"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource LibraryTextColor}" />
+                    <TextBlock Text="{x:Static resources:Strings.LoadingLibrary}"
+                               HorizontalAlignment="Center"
+                               Classes="label" />
+                </StackPanel>
+                <ProgressBar Width="240"
+                             Height="4"
+                             IsIndeterminate="True" />
+            </StackPanel>
+        </Border>
+
+    <DockPanel x:Name="LibraryContent"
+               IsVisible="False"
+               Background="{DynamicResource LibraryBackgroundColor}">
         <Menu DockPanel.Dock="Top"
               Background="{DynamicResource LibrarySurfaceColor}"
               automation:AutomationProperties.LandmarkType="Navigation">
@@ -76,6 +104,7 @@
                 <MenuItem Header="{x:Static resources:Strings.ChooseLibraryFolder}" Click="ChooseFolder_OnClick" />
                 <MenuItem Header="{x:Static resources:Strings.RescanLibrary}" Click="Rescan_OnClick" />
                 <Separator />
+                <MenuItem Header="{x:Static resources:Strings.ImportDatabase}" Click="ImportDatabase_OnClick" />
                 <MenuItem Header="{x:Static resources:Strings.ExportDatabase}" Click="ExportDatabase_OnClick" />
                 <MenuItem Header="{x:Static resources:Strings.CleanDatabase}" Click="CleanDatabase_OnClick" />
                 <Separator />
@@ -162,7 +191,10 @@
                                         <TextBlock Text="{Binding Author}" Classes="label" TextWrapping="Wrap" />
                                         <Grid ColumnDefinitions="*,Auto">
                                             <TextBlock Text="{Binding Format}" Classes="label" />
-                                            <TextBlock Grid.Column="1" Text="{Binding PageCount, StringFormat={x:Static resources:Strings.PageCountFormat}}" Classes="label" />
+                                            <TextBlock Grid.Column="1"
+                                                       Text="{Binding PageCount, StringFormat={x:Static resources:Strings.PageCountFormat}}"
+                                                       Classes="label"
+                                                       IsVisible="{Binding HasPageCount}" />
                                         </Grid>
                                         
                                         <Button Content="{x:Static resources:Strings.EditDetails}"
@@ -192,4 +224,5 @@
             </ScrollViewer>
         </Grid>
     </DockPanel>
+    </Grid>
 </Window>

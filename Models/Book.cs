@@ -2,6 +2,7 @@ using System;
 
 namespace Book_Shelf.Models;
 
+/// <summary>Represents a book file and its editable catalog metadata.</summary>
 public sealed class Book
 {
     public int Id { get; set; }

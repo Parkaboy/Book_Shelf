@@ -6,6 +6,7 @@ using Serilog;
 
 namespace Book_Shelf;
 
+/// <summary>Provides the process entry point and application-wide startup services.</summary>
 class Program
 {
     internal static string ErrorLogPath => Path.Combine(
@@ -16,6 +17,7 @@ class Program
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
     // yet and stuff might break.
+    /// <summary>Configures process-level handlers and starts the Avalonia desktop lifetime.</summary>
     [STAThread]
     public static void Main(string[] args)
     {
@@ -33,6 +35,7 @@ class Program
         }
     }
 
+    /// <summary>Writes an unhandled application exception to the error log.</summary>
     private static void OnUnhandledException(object? sender, UnhandledExceptionEventArgs args)
     {
         var exception = args.ExceptionObject as Exception ??
@@ -40,12 +43,14 @@ class Program
         Log.Fatal(exception, "Unhandled exception");
     }
 
+    /// <summary>Logs an unobserved task exception and marks it as handled.</summary>
     private static void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs args)
     {
         Log.Error(args.Exception, "Unobserved task exception");
         args.SetObserved();
     }
 
+    /// <summary>Configures the file-based Serilog error logger.</summary>
     private static void ConfigureLogging()
     {
         var logDirectory = Path.GetDirectoryName(ErrorLogPath)!;
@@ -58,6 +63,7 @@ class Program
     }
 
     // Avalonia configuration, don't remove; also used by visual designer.
+    /// <summary>Creates the platform-aware Avalonia application builder.</summary>
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()

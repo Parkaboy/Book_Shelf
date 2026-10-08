@@ -8,10 +8,12 @@ using Book_Shelf.Models;
 
 namespace Book_Shelf.Services;
 
+/// <summary>Finds and caches a cover image embedded in an EPUB archive.</summary>
 public sealed class EmbeddedEpubCoverStrategy : IBookCoverStrategy
 {
     private static readonly string[] ImageExtensions = [".jpg", ".jpeg", ".png"];
 
+    /// <summary>Extracts a preferred image entry from an EPUB file into the cover cache.</summary>
     public async Task<string?> TryResolveAsync(
         Book book,
         string destinationPath,

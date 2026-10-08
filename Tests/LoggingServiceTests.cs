@@ -5,10 +5,12 @@ using Xunit;
 
 namespace Book_Shelf.Tests;
 
+/// <summary>Verifies error logging and cleans up temporary logger files.</summary>
 public sealed class SerilogTests : IDisposable
 {
     private readonly string testRoot = Path.Combine(Path.GetTempPath(), "BookShelfLoggingTests", Guid.NewGuid().ToString("N"));
 
+    /// <summary>Verifies log entries include operation context and exception details.</summary>
     [Fact]
     public void Serilog_WritesContextAndExceptionToErrorFile()
     {
@@ -35,6 +37,7 @@ public sealed class SerilogTests : IDisposable
         }
     }
 
+    /// <summary>Deletes the temporary directory created for the logging test.</summary>
     public void Dispose()
     {
         if (Directory.Exists(testRoot))

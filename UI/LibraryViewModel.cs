@@ -14,9 +14,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Book_Shelf.UI;
 
+/// <summary>Maintains the displayed library, its filters, and user-driven book operations.</summary>
 public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
 {
     private readonly LibrarySyncService syncService = new();
+    private readonly List<BookItemViewModel> allBooks = new();
+    private BookItemViewModel? selectedBook;
     private string? searchText;
     private string selectedOrder = Strings.OrderByTitle;
     private string selectedFilter = Strings.FilterAll;
@@ -32,7 +35,8 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
     [
         Strings.OrderByTitle,
         Strings.OrderByAuthor,
-        Strings.OrderByDateAdded
+        Strings.OrderByDateAdded,
+        Strings.OrderByPageCount
     ];
 
     public IReadOnlyList<string> FilterOptions { get; } =
@@ -57,7 +61,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
 
             searchText = value;
             OnPropertyChanged();
-            _ = LoadBooksAsync();
+            ApplyBookView();
         }
     }
 
@@ -73,7 +77,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
 
             selectedOrder = value;
             OnPropertyChanged();
-            _ = LoadBooksAsync();
+            ApplyBookView();
         }
     }
 
@@ -89,7 +93,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
 
             selectedFilter = value;
             OnPropertyChanged();
-            _ = LoadBooksAsync();
+            ApplyBookView();
         }
     }
 
@@ -111,8 +115,10 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
         private set => SetField(ref isBusy, value);
     }
 
+    /// <summary>Updates the current status message shown in the library window.</summary>
     public void SetStatusMessage(string message) => StatusMessage = message;
 
+    /// <summary>Applies database migrations, loads saved settings, and populates the library.</summary>
     public async Task InitializeAsync()
     {
         await using (var database = LibraryDbContext.Create())
@@ -139,6 +145,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
         }
     }
 
+    /// <summary>Saves a library folder selection and synchronizes its book files.</summary>
     public async Task SetLibraryFolderAsync(string folderPath)
     {
         var settings = new LibrarySettings { LibraryFolderPath = Path.GetFullPath(folderPath) };
@@ -147,6 +154,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
         await SynchronizeAsync();
     }
 
+    /// <summary>Synchronizes the selected folder and refreshes the displayed book list.</summary>
     public async Task SynchronizeAsync()
     {
         if (LibraryFolder == Strings.NoLibraryFolderSelected || !Directory.Exists(LibraryFolder))
@@ -171,27 +179,40 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
         }
     }
 
+    /// <summary>Enables metadata editing for the selected book card.</summary>
     public void BeginEditing(BookItemViewModel book)
     {
         book.IsEditing = true;
     }
 
+    /// <summary>Marks a book as selected and clears selection from the previously selected book.</summary>
     public void SelectBook(BookItemViewModel selectedBook)
     {
-        foreach (var book in Books)
+        if (ReferenceEquals(this.selectedBook, selectedBook))
         {
-            book.IsSelected = ReferenceEquals(book, selectedBook);
+            return;
         }
+
+        if (this.selectedBook is not null)
+        {
+            this.selectedBook.IsSelected = false;
+        }
+
+        this.selectedBook = selectedBook;
+        selectedBook.IsSelected = true;
     }
 
+    /// <summary>Saves edited book metadata and refreshes its card and cover.</summary>
     public async Task SaveBookAsync(BookItemViewModel book)
     {
         await syncService.SaveBookAsync(book.Book);
         book.IsEditing = false;
         book.ReloadCoverImage();
+        ApplyBookView();
         StatusMessage = string.Format(Strings.UpdatedBookFormat, book.Title);
     }
 
+    /// <summary>Deletes the selected book and refreshes the displayed catalog.</summary>
     public async Task DeleteBookAsync(BookItemViewModel book)
     {
         await syncService.DeleteBookAsync(book.Book);
@@ -199,6 +220,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
         StatusMessage = string.Format(Strings.DeletedBookFormat, book.Title);
     }
 
+    /// <summary>Clears all catalog entries while retaining original book files.</summary>
     public async Task ClearDatabaseAsync()
     {
         await syncService.ClearDatabaseAsync();
@@ -206,54 +228,114 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
         StatusMessage = Strings.DatabaseCleaned;
     }
 
+    /// <summary>Replaces the active database with a validated import and reloads the catalog.</summary>
+    public async Task ImportDatabaseAsync(string sourcePath)
+    {
+        await DatabaseImportService.ImportAsync(sourcePath, LibraryDbContext.GetDatabasePath());
+        await LoadBooksAsync();
+        StatusMessage = Strings.DatabaseImported;
+    }
+
+    /// <summary>Loads database books into view models and reapplies the current view settings.</summary>
     private async Task LoadBooksAsync()
     {
-        var books = await syncService.SearchAsync(SearchText);
-        TotalBookCount = string.IsNullOrWhiteSpace(SearchText)
-            ? books.Count
-            : (await syncService.SearchAsync()).Count;
-        IEnumerable<Book> filteredBooks = SelectedFilter switch
+        var books = await syncService.SearchAsync();
+        TotalBookCount = books.Count;
+
+        foreach (var book in allBooks)
         {
-            var filter when filter == Strings.FilterEpub => books.Where(book => book.Format == "EPUB"),
-            var filter when filter == Strings.FilterPdf => books.Where(book => book.Format == "PDF"),
-            var filter when filter == Strings.FilterMobi => books.Where(book => book.Format == "MOBI"),
-            var filter when filter == Strings.FilterRtf => books.Where(book => book.Format == "RTF"),
-            var filter when filter == Strings.FilterTxt => books.Where(book => book.Format == "TXT"),
-            _ => books
+            book.Dispose();
+        }
+
+        allBooks.Clear();
+        allBooks.AddRange(books.Select(book => new BookItemViewModel(book)));
+        selectedBook = null;
+        ApplyBookView();
+    }
+
+    /// <summary>Filters and sorts the book collection while preserving the selected item.</summary>
+    private void ApplyBookView()
+    {
+        IEnumerable<BookItemViewModel> filteredBooks = allBooks;
+        var search = SearchText?.Trim();
+        if (!string.IsNullOrEmpty(search))
+        {
+            filteredBooks = filteredBooks.Where(book =>
+                book.Title.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                (book.Author?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (book.Isbn?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false));
+        }
+
+        filteredBooks = SelectedFilter switch
+        {
+            var filter when filter == Strings.FilterEpub => filteredBooks.Where(book => book.Format == "EPUB"),
+            var filter when filter == Strings.FilterPdf => filteredBooks.Where(book => book.Format == "PDF"),
+            var filter when filter == Strings.FilterMobi => filteredBooks.Where(book => book.Format == "MOBI"),
+            var filter when filter == Strings.FilterRtf => filteredBooks.Where(book => book.Format == "RTF"),
+            var filter when filter == Strings.FilterTxt => filteredBooks.Where(book => book.Format == "TXT"),
+            _ => filteredBooks
         };
 
         filteredBooks = SelectedOrder switch
         {
             var order when order == Strings.OrderByAuthor => filteredBooks.OrderBy(book => book.Author ?? book.Title),
-            var order when order == Strings.OrderByDateAdded => filteredBooks.OrderByDescending(book => book.ImportedUtc),
+            var order when order == Strings.OrderByDateAdded => filteredBooks.OrderByDescending(book => book.Book.ImportedUtc),
+            var order when order == Strings.OrderByPageCount => filteredBooks
+                .OrderBy(book => book.PageCount ?? int.MaxValue)
+                .ThenBy(book => book.Title),
             _ => filteredBooks.OrderBy(book => book.Title)
         };
 
-        ClearBooks();
+        var desiredBooks = filteredBooks.ToList();
+        var visibleBooks = desiredBooks.ToHashSet();
 
-        foreach (var book in filteredBooks)
+        for (var index = Books.Count - 1; index >= 0; index--)
         {
-            Books.Add(new BookItemViewModel(book));
+            if (!visibleBooks.Contains(Books[index]))
+            {
+                if (ReferenceEquals(selectedBook, Books[index]))
+                {
+                    selectedBook.IsSelected = false;
+                    selectedBook = null;
+                }
+
+                Books.RemoveAt(index);
+            }
+        }
+
+        for (var targetIndex = 0; targetIndex < desiredBooks.Count; targetIndex++)
+        {
+            var currentIndex = Books.IndexOf(desiredBooks[targetIndex]);
+            if (currentIndex < 0)
+            {
+                Books.Insert(targetIndex, desiredBooks[targetIndex]);
+            }
+            else if (currentIndex != targetIndex)
+            {
+                Books.Move(currentIndex, targetIndex);
+            }
         }
     }
 
-    public void Dispose() => ClearBooks();
-
-    private void ClearBooks()
+    /// <summary>Disposes loaded book view models and clears the visible collection.</summary>
+    public void Dispose()
     {
-        foreach (var book in Books)
+        foreach (var book in allBooks)
         {
             book.Dispose();
         }
 
+        allBooks.Clear();
         Books.Clear();
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    /// <summary>Raises a property-changed notification for the specified or caller property.</summary>
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
+    /// <summary>Updates a backing field and notifies bindings only when its value changes.</summary>
     private void SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
     {
         if (Equals(field, value))

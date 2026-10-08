@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Book_Shelf.Services;
 
+/// <summary>Synchronizes supported book files with the database and manages book records.</summary>
 public sealed class LibrarySyncService
 {
     private readonly Func<LibraryDbContext> contextFactory;
@@ -25,22 +26,26 @@ public sealed class LibrarySyncService
         ".txt"
     };
 
+    /// <summary>Creates a sync service using the default database and cover services.</summary>
     public LibrarySyncService()
         : this(LibraryDbContext.Create)
     {
     }
 
+    /// <summary>Creates a sync service using a custom database context factory.</summary>
     public LibrarySyncService(Func<LibraryDbContext> contextFactory)
         : this(contextFactory, new BookCoverService())
     {
     }
 
+    /// <summary>Creates a sync service using custom database and cover services.</summary>
     public LibrarySyncService(Func<LibraryDbContext> contextFactory, BookCoverService coverService)
     {
         this.contextFactory = contextFactory;
         this.coverService = coverService;
     }
 
+    /// <summary>Updates database records to match supported files in the selected folder.</summary>
     public async Task<int> SynchronizeAsync(string folderPath, CancellationToken cancellationToken = default)
     {
         var fullFolderPath = Path.GetFullPath(folderPath);
@@ -55,7 +60,7 @@ public sealed class LibrarySyncService
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         await using var database = contextFactory();
-        await database.Database.MigrateAsync(cancellationToken);
+    //    await database.Database.MigrateAsync(cancellationToken);
 
         var folderPrefix = fullFolderPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
             + Path.DirectorySeparatorChar;
@@ -126,6 +131,7 @@ public sealed class LibrarySyncService
         return changedBooks;
     }
 
+    /// <summary>Returns catalog entries, optionally matching title, author, or ISBN text.</summary>
     public async Task<IReadOnlyList<Book>> SearchAsync(string? searchText = null, CancellationToken cancellationToken = default)
     {
         await using var database = contextFactory();
@@ -143,6 +149,7 @@ public sealed class LibrarySyncService
         return await query.OrderBy(book => book.Title).ToListAsync(cancellationToken);
     }
 
+    /// <summary>Persists edited metadata and refreshes the book's cached cover.</summary>
     public async Task SaveBookAsync(Book editedBook, CancellationToken cancellationToken = default)
     {
         await using var database = contextFactory();
@@ -162,6 +169,7 @@ public sealed class LibrarySyncService
         editedBook.CoverPath = book.CoverPath;
     }
 
+    /// <summary>Removes a book record, its cached cover, and the original book file.</summary>
     public async Task DeleteBookAsync(Book bookToDelete, CancellationToken cancellationToken = default)
     {
         await using var database = contextFactory();
@@ -176,6 +184,7 @@ public sealed class LibrarySyncService
         }
     }
 
+    /// <summary>Removes all book records and cached covers without deleting source book files.</summary>
     public async Task ClearDatabaseAsync(CancellationToken cancellationToken = default)
     {
         await using var database = contextFactory();
@@ -189,6 +198,7 @@ public sealed class LibrarySyncService
         await database.SaveChangesAsync(cancellationToken);
     }
 
+    /// <summary>Computes the SHA-256 content hash for a book file.</summary>
     private static async Task<string> ComputeHashAsync(string filePath, CancellationToken cancellationToken)
     {
         await using var stream = File.OpenRead(filePath);

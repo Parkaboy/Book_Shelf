@@ -4,15 +4,18 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using Avalonia.Media.Imaging;
 using Book_Shelf.Models;
+using Serilog;
 
 namespace Book_Shelf.UI;
 
+/// <summary>Exposes a book record and cover image for binding in the library interface.</summary>
 public sealed class BookItemViewModel : INotifyPropertyChanged, IDisposable
 {
     private bool isSelected;
     private bool isEditing;
     private Bitmap? coverImage;
 
+    /// <summary>Creates a view model for a book and loads its cached cover if available.</summary>
     public BookItemViewModel(Book book)
     {
         Book = book;
@@ -78,8 +81,11 @@ public sealed class BookItemViewModel : INotifyPropertyChanged, IDisposable
 
             Book.PageCount = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(HasPageCount));
         }
     }
+
+    public bool HasPageCount => PageCount.HasValue;
 
     public string Format => Book.Format;
 
@@ -113,28 +119,34 @@ public sealed class BookItemViewModel : INotifyPropertyChanged, IDisposable
         }
     }
 
+    /// <summary>Reloads the cover image from the book's cached cover path.</summary>
     public void ReloadCoverImage()
     {
         CoverImage = null;
-        if (string.IsNullOrWhiteSpace(Book.CoverPath) || !File.Exists(Book.CoverPath))
+        if (string.IsNullOrWhiteSpace(Book.CoverPath))
         {
+            return;
+        }
+
+        if (!File.Exists(Book.CoverPath))
+        {
+            Log.Warning("Book cover file does not exist: {CoverPath}", Book.CoverPath);
             return;
         }
 
         try
         {
-            CoverImage = new Bitmap(Book.CoverPath);
+            using var coverStream = File.OpenRead(Book.CoverPath);
+            CoverImage = Bitmap.DecodeToWidth(coverStream, 480, BitmapInterpolationMode.HighQuality);
         }
-        catch (IOException)
+        catch (Exception exception)
         {
             CoverImage = null;
-        }
-        catch (ArgumentException)
-        {
-            CoverImage = null;
+            Log.Warning(exception, "Failed to load book cover from {CoverPath}", Book.CoverPath);
         }
     }
 
+    /// <summary>Releases the currently loaded cover bitmap.</summary>
     public void Dispose()
     {
         CoverImage = null;
@@ -142,9 +154,11 @@ public sealed class BookItemViewModel : INotifyPropertyChanged, IDisposable
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    /// <summary>Raises a property-changed notification for the specified or caller property.</summary>
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
+    /// <summary>Updates a backing field and notifies bindings when its value changes.</summary>
     private void SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
     {
         if (Equals(field, value))

@@ -11,11 +11,13 @@ using Book_Shelf.Models;
 
 namespace Book_Shelf.Services;
 
+/// <summary>Resolves, caches, and removes book cover images using configured strategies.</summary>
 public sealed class BookCoverService
 {
     private readonly string cacheDirectory;
     private readonly IReadOnlyList<IBookCoverStrategy> strategies;
 
+    /// <summary>Creates a cover service using the user's local cover cache and default strategies.</summary>
     public BookCoverService()
         : this(
             Path.Combine(
@@ -26,29 +28,32 @@ public sealed class BookCoverService
     {
     }
 
+    /// <summary>Creates a cover service using the specified cache directory.</summary>
     public BookCoverService(string cacheDirectory)
         : this(cacheDirectory, CreateHttpClient())
     {
     }
 
+    /// <summary>Creates a cover service with an HTTP client for online cover lookup.</summary>
     public BookCoverService(string cacheDirectory, HttpClient httpClient)
         : this(
             cacheDirectory,
-            new IBookCoverStrategy[]
-            {
+            [
                 new LocalBookCoverStrategy(),
                 new EmbeddedEpubCoverStrategy(),
                 new GoogleBooksCoverStrategy(httpClient)
-            })
+            ])
     {
     }
 
+    /// <summary>Creates a cover service with the specified cache directory and lookup strategies.</summary>
     public BookCoverService(string cacheDirectory, IReadOnlyList<IBookCoverStrategy> strategies)
     {
         this.cacheDirectory = cacheDirectory;
         this.strategies = strategies;
     }
 
+    /// <summary>Returns a cached or newly resolved cover image path for the book.</summary>
     public async Task<string?> ResolveAsync(
         Book book,
         CancellationToken cancellationToken = default)
@@ -72,6 +77,7 @@ public sealed class BookCoverService
         return null;
     }
 
+    /// <summary>Deletes a cover file when a path is provided.</summary>
     public void Delete(string? coverPath)
     {
         if (!string.IsNullOrWhiteSpace(coverPath) && File.Exists(coverPath))
@@ -80,6 +86,7 @@ public sealed class BookCoverService
         }
     }
 
+    /// <summary>Builds a stable cache key from the book's content and lookup identity.</summary>
     private static string BuildCacheKey(Book book)
     {
         var lookupIdentity = NormalizeIsbn(book.Isbn) ??
@@ -88,6 +95,7 @@ public sealed class BookCoverService
         return Convert.ToHexString(SHA256.HashData(bytes));
     }
 
+    /// <summary>Normalizes a valid ISBN for cover lookup and cache identity.</summary>
     private static string? NormalizeIsbn(string? isbn)
     {
         if (string.IsNullOrWhiteSpace(isbn))
@@ -99,6 +107,7 @@ public sealed class BookCoverService
         return normalized.Length is 10 or 13 ? normalized.ToUpperInvariant() : null;
     }
 
+    /// <summary>Creates the HTTP client used to retrieve online book covers.</summary>
     private static HttpClient CreateHttpClient() => new()
     {
         Timeout = TimeSpan.FromSeconds(8)
