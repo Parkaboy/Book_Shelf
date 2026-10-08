@@ -4,6 +4,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using Avalonia.Media.Imaging;
 using Book_Shelf.Models;
+using Serilog;
 
 namespace Book_Shelf.UI;
 
@@ -116,8 +117,14 @@ public sealed class BookItemViewModel : INotifyPropertyChanged, IDisposable
     public void ReloadCoverImage()
     {
         CoverImage = null;
-        if (string.IsNullOrWhiteSpace(Book.CoverPath) || !File.Exists(Book.CoverPath))
+        if (string.IsNullOrWhiteSpace(Book.CoverPath))
         {
+            return;
+        }
+
+        if (!File.Exists(Book.CoverPath))
+        {
+            Log.Warning("Book cover file does not exist: {CoverPath}", Book.CoverPath);
             return;
         }
 
@@ -126,13 +133,10 @@ public sealed class BookItemViewModel : INotifyPropertyChanged, IDisposable
             using var coverStream = File.OpenRead(Book.CoverPath);
             CoverImage = Bitmap.DecodeToWidth(coverStream, 480, BitmapInterpolationMode.HighQuality);
         }
-        catch (IOException)
+        catch (Exception exception)
         {
             CoverImage = null;
-        }
-        catch (ArgumentException)
-        {
-            CoverImage = null;
+            Log.Warning(exception, "Failed to load book cover from {CoverPath}", Book.CoverPath);
         }
     }
 

@@ -217,6 +217,13 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
         StatusMessage = Strings.DatabaseCleaned;
     }
 
+    public async Task ImportDatabaseAsync(string sourcePath)
+    {
+        await DatabaseImportService.ImportAsync(sourcePath, LibraryDbContext.GetDatabasePath());
+        await LoadBooksAsync();
+        StatusMessage = Strings.DatabaseImported;
+    }
+
     private async Task LoadBooksAsync()
     {
         var books = await syncService.SearchAsync();

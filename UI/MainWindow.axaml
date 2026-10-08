@@ -76,6 +76,7 @@
                 <MenuItem Header="{x:Static resources:Strings.ChooseLibraryFolder}" Click="ChooseFolder_OnClick" />
                 <MenuItem Header="{x:Static resources:Strings.RescanLibrary}" Click="Rescan_OnClick" />
                 <Separator />
+                <MenuItem Header="{x:Static resources:Strings.ImportDatabase}" Click="ImportDatabase_OnClick" />
                 <MenuItem Header="{x:Static resources:Strings.ExportDatabase}" Click="ExportDatabase_OnClick" />
                 <MenuItem Header="{x:Static resources:Strings.CleanDatabase}" Click="CleanDatabase_OnClick" />
                 <Separator />

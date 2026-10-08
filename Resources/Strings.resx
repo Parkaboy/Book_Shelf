@@ -46,10 +46,19 @@
   <data name="Dark" xml:space="preserve"><value>Dark</value></data>
   <data name="System" xml:space="preserve"><value>System</value></data>
   <data name="Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="DeleteBookConfirmationTitle" xml:space="preserve"><value>Delete book?</value></data>
+  <data name="DeleteBookConfirmationMessageFormat" xml:space="preserve"><value>Remove &quot;{0}&quot; from your library and permanently delete its book file from disk? This cannot be undone.</value></data>
   <data name="DeletedBookFormat" xml:space="preserve"><value>Removed {0} from the library.</value></data>
   <data name="ExportDatabase" xml:space="preserve"><value>Export database...</value></data>
+  <data name="ImportDatabase" xml:space="preserve"><value>Import database...</value></data>
+  <data name="ImportDatabaseConfirmationTitle" xml:space="preserve"><value>Replace database?</value></data>
+  <data name="ImportDatabaseConfirmationMessage" xml:space="preserve"><value>This will replace your current database with the selected file. This cannot be undone.</value></data>
+  <data name="DatabaseImported" xml:space="preserve"><value>Database imported successfully.</value></data>
+  <data name="DatabaseImportFailed" xml:space="preserve"><value>Could not complete the database import. Check the error log.</value></data>
   <data name="SQLiteDatabase" xml:space="preserve"><value>SQLite database</value></data>
   <data name="CleanDatabase" xml:space="preserve"><value>Clean database data</value></data>
+  <data name="CleanDatabaseConfirmationTitle" xml:space="preserve"><value>Clean database?</value></data>
+  <data name="CleanDatabaseConfirmationMessage" xml:space="preserve"><value>This will remove all book records and cached covers from the database. Original book files will not be deleted. This cannot be undone.</value></data>
   <data name="DatabaseCleaned" xml:space="preserve"><value>Database data cleaned.</value></data>
   <data name="NoLibraryFolderSelected" xml:space="preserve"><value>No library folder selected</value></data>
   <data name="Pages" xml:space="preserve"><value>Pages</value></data>
@@ -71,5 +80,6 @@
   <data name="BuyMeACoffeeMessage" xml:space="preserve"><value>Enjoying Book Shelf? Buy me a coffee</value></data>
   <data name="BuyMeACoffeeUrl" xml:space="preserve"><value>https://www.buymeacoffee.com/parkaboy</value></data>
   <data name="Close" xml:space="preserve"><value>Close</value></data>
+  <data name="Cancel" xml:space="preserve"><value>Cancel</value></data>
   <data name="YourLibrary" xml:space="preserve"><value>Your library</value></data>
 </root>

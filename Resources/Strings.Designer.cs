@@ -27,6 +27,7 @@ public static class Strings
     public static string BuyMeACoffeeMessage => GetString(nameof(BuyMeACoffeeMessage));
     public static string BuyMeACoffeeUrl => GetString(nameof(BuyMeACoffeeUrl));
     public static string Close => GetString(nameof(Close));
+    public static string Cancel => GetString(nameof(Cancel));
     public static string ChooseExistingLibraryFolderFirst => GetString(nameof(ChooseExistingLibraryFolderFirst));
     public static string ChooseLibraryFolder => GetString(nameof(ChooseLibraryFolder));
     public static string ChooseYourBookLibrary => GetString(nameof(ChooseYourBookLibrary));
@@ -61,10 +62,19 @@ public static class Strings
     public static string Dark => GetString(nameof(Dark));
     public static string System => GetString(nameof(System));
     public static string Delete => GetString(nameof(Delete));
+    public static string DeleteBookConfirmationTitle => GetString(nameof(DeleteBookConfirmationTitle));
+    public static string DeleteBookConfirmationMessageFormat => GetString(nameof(DeleteBookConfirmationMessageFormat));
     public static string DeletedBookFormat => GetString(nameof(DeletedBookFormat));
     public static string ExportDatabase => GetString(nameof(ExportDatabase));
+    public static string ImportDatabase => GetString(nameof(ImportDatabase));
+    public static string ImportDatabaseConfirmationTitle => GetString(nameof(ImportDatabaseConfirmationTitle));
+    public static string ImportDatabaseConfirmationMessage => GetString(nameof(ImportDatabaseConfirmationMessage));
+    public static string DatabaseImported => GetString(nameof(DatabaseImported));
+    public static string DatabaseImportFailed => GetString(nameof(DatabaseImportFailed));
     public static string SQLiteDatabase => GetString(nameof(SQLiteDatabase));
     public static string CleanDatabase => GetString(nameof(CleanDatabase));
+    public static string CleanDatabaseConfirmationTitle => GetString(nameof(CleanDatabaseConfirmationTitle));
+    public static string CleanDatabaseConfirmationMessage => GetString(nameof(CleanDatabaseConfirmationMessage));
     public static string DatabaseCleaned => GetString(nameof(DatabaseCleaned));
     public static string NoLibraryFolderSelected => GetString(nameof(NoLibraryFolderSelected));
     public static string Pages => GetString(nameof(Pages));
