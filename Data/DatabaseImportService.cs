@@ -6,8 +6,10 @@ using Microsoft.Data.Sqlite;
 
 namespace Book_Shelf.Data;
 
+/// <summary>Validates and safely replaces the active SQLite library database.</summary>
 public static class DatabaseImportService
 {
+    /// <summary>Copies a compatible Book Shelf database into the destination atomically.</summary>
     public static async Task ImportAsync(
         string sourcePath,
         string destinationPath,
@@ -70,6 +72,7 @@ public static class DatabaseImportService
         }
     }
 
+    /// <summary>Checks database integrity, schema, and Book Shelf migration compatibility.</summary>
     private static async Task ValidateDatabaseAsync(
         SqliteConnection connection,
         CancellationToken cancellationToken)

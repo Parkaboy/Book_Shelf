@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Book_Shelf.UI;
 
+/// <summary>Maintains the displayed library, its filters, and user-driven book operations.</summary>
 public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
 {
     private readonly LibrarySyncService syncService = new();
@@ -34,7 +35,8 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
     [
         Strings.OrderByTitle,
         Strings.OrderByAuthor,
-        Strings.OrderByDateAdded
+        Strings.OrderByDateAdded,
+        Strings.OrderByPageCount
     ];
 
     public IReadOnlyList<string> FilterOptions { get; } =
@@ -113,8 +115,10 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
         private set => SetField(ref isBusy, value);
     }
 
+    /// <summary>Updates the current status message shown in the library window.</summary>
     public void SetStatusMessage(string message) => StatusMessage = message;
 
+    /// <summary>Applies database migrations, loads saved settings, and populates the library.</summary>
     public async Task InitializeAsync()
     {
         await using (var database = LibraryDbContext.Create())
@@ -141,6 +145,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
         }
     }
 
+    /// <summary>Saves a library folder selection and synchronizes its book files.</summary>
     public async Task SetLibraryFolderAsync(string folderPath)
     {
         var settings = new LibrarySettings { LibraryFolderPath = Path.GetFullPath(folderPath) };
@@ -149,6 +154,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
         await SynchronizeAsync();
     }
 
+    /// <summary>Synchronizes the selected folder and refreshes the displayed book list.</summary>
     public async Task SynchronizeAsync()
     {
         if (LibraryFolder == Strings.NoLibraryFolderSelected || !Directory.Exists(LibraryFolder))
@@ -173,11 +179,13 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
         }
     }
 
+    /// <summary>Enables metadata editing for the selected book card.</summary>
     public void BeginEditing(BookItemViewModel book)
     {
         book.IsEditing = true;
     }
 
+    /// <summary>Marks a book as selected and clears selection from the previously selected book.</summary>
     public void SelectBook(BookItemViewModel selectedBook)
     {
         if (ReferenceEquals(this.selectedBook, selectedBook))
@@ -194,6 +202,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
         selectedBook.IsSelected = true;
     }
 
+    /// <summary>Saves edited book metadata and refreshes its card and cover.</summary>
     public async Task SaveBookAsync(BookItemViewModel book)
     {
         await syncService.SaveBookAsync(book.Book);
@@ -203,6 +212,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
         StatusMessage = string.Format(Strings.UpdatedBookFormat, book.Title);
     }
 
+    /// <summary>Deletes the selected book and refreshes the displayed catalog.</summary>
     public async Task DeleteBookAsync(BookItemViewModel book)
     {
         await syncService.DeleteBookAsync(book.Book);
@@ -210,6 +220,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
         StatusMessage = string.Format(Strings.DeletedBookFormat, book.Title);
     }
 
+    /// <summary>Clears all catalog entries while retaining original book files.</summary>
     public async Task ClearDatabaseAsync()
     {
         await syncService.ClearDatabaseAsync();
@@ -217,6 +228,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
         StatusMessage = Strings.DatabaseCleaned;
     }
 
+    /// <summary>Replaces the active database with a validated import and reloads the catalog.</summary>
     public async Task ImportDatabaseAsync(string sourcePath)
     {
         await DatabaseImportService.ImportAsync(sourcePath, LibraryDbContext.GetDatabasePath());
@@ -224,6 +236,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
         StatusMessage = Strings.DatabaseImported;
     }
 
+    /// <summary>Loads database books into view models and reapplies the current view settings.</summary>
     private async Task LoadBooksAsync()
     {
         var books = await syncService.SearchAsync();
@@ -240,6 +253,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
         ApplyBookView();
     }
 
+    /// <summary>Filters and sorts the book collection while preserving the selected item.</summary>
     private void ApplyBookView()
     {
         IEnumerable<BookItemViewModel> filteredBooks = allBooks;
@@ -266,6 +280,9 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
         {
             var order when order == Strings.OrderByAuthor => filteredBooks.OrderBy(book => book.Author ?? book.Title),
             var order when order == Strings.OrderByDateAdded => filteredBooks.OrderByDescending(book => book.Book.ImportedUtc),
+            var order when order == Strings.OrderByPageCount => filteredBooks
+                .OrderBy(book => book.PageCount ?? int.MaxValue)
+                .ThenBy(book => book.Title),
             _ => filteredBooks.OrderBy(book => book.Title)
         };
 
@@ -300,6 +317,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
         }
     }
 
+    /// <summary>Disposes loaded book view models and clears the visible collection.</summary>
     public void Dispose()
     {
         foreach (var book in allBooks)
@@ -313,9 +331,11 @@ public sealed class LibraryViewModel : INotifyPropertyChanged, IDisposable
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    /// <summary>Raises a property-changed notification for the specified or caller property.</summary>
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
+    /// <summary>Updates a backing field and notifies bindings only when its value changes.</summary>
     private void SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
     {
         if (Equals(field, value))

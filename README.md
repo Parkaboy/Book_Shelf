@@ -24,9 +24,9 @@ Book Shelf catalogs the files where they are; it does not copy them into a separ
 ## Browse and manage books
 
 - Search by title, author, or ISBN using the search box.
-- Use the **Order by** and **Filter** lists to sort the displayed books by title, author, or date added, or show only one format.
+- Use the **Order by** and **Filter** lists to sort the displayed books by title, author, date added, or number of pages, or show only one format.
 - Double-click a book card (or select it and press **Enter** or **Space**) to open the book with the application associated with its file type.
-- Choose **Edit details** on a card to change its title, author, ISBN, or page count, then select **Save**.
+- Choose **Edit details** on a card to change its title, author, ISBN, or page count, then select **Save**. The page count appears on the card only after a value is entered.
 - Choose **Delete** to remove a book from the catalog and permanently delete its original book file from disk. This cannot be undone.
 
 ## Database and settings

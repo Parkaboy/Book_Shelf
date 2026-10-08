@@ -7,8 +7,10 @@ using Xunit;
 
 namespace Book_Shelf.Tests;
 
+/// <summary>Verifies that database imports replace only compatible, validated library databases.</summary>
 public sealed class DatabaseImportServiceTests
 {
+    /// <summary>Verifies a valid imported database replaces the destination and retains its records.</summary>
     [Fact]
     public async Task ImportAsync_ReplacesDestinationWithValidatedLibraryDatabase()
     {
@@ -42,6 +44,7 @@ public sealed class DatabaseImportServiceTests
         }
     }
 
+    /// <summary>Verifies an incompatible database is rejected without changing the destination.</summary>
     [Fact]
     public async Task ImportAsync_RejectsNonLibraryDatabaseWithoutReplacingDestination()
     {
@@ -69,6 +72,7 @@ public sealed class DatabaseImportServiceTests
         }
     }
 
+    /// <summary>Creates a SQLite database with the current Book Shelf schema and one book.</summary>
     private static async Task CreateLibraryDatabaseAsync(string path, string title)
     {
         await using var connection = new SqliteConnection($"Data Source={path}");
@@ -104,6 +108,7 @@ public sealed class DatabaseImportServiceTests
         await command.ExecuteNonQueryAsync();
     }
 
+    /// <summary>Creates and returns a unique temporary directory for an import test.</summary>
     private static string CreateTemporaryDirectory()
     {
         var path = Path.Combine(Path.GetTempPath(), $"BookShelf-{Guid.NewGuid():N}");

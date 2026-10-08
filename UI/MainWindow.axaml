@@ -191,7 +191,10 @@
                                         <TextBlock Text="{Binding Author}" Classes="label" TextWrapping="Wrap" />
                                         <Grid ColumnDefinitions="*,Auto">
                                             <TextBlock Text="{Binding Format}" Classes="label" />
-                                            <TextBlock Grid.Column="1" Text="{Binding PageCount, StringFormat={x:Static resources:Strings.PageCountFormat}}" Classes="label" />
+                                            <TextBlock Grid.Column="1"
+                                                       Text="{Binding PageCount, StringFormat={x:Static resources:Strings.PageCountFormat}}"
+                                                       Classes="label"
+                                                       IsVisible="{Binding HasPageCount}" />
                                         </Grid>
                                         
                                         <Button Content="{x:Static resources:Strings.EditDetails}"

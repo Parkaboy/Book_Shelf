@@ -4,8 +4,10 @@ using System.Threading.Tasks;
 
 namespace Book_Shelf.Services;
 
+/// <summary>Provides safe file-copy operations for cached cover images.</summary>
 internal static class CoverFileCache
 {
+    /// <summary>Copies a cover through a temporary file before replacing the cache destination.</summary>
     public static async Task<string> CopyAsync(
         string sourcePath,
         string destinationPath,

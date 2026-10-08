@@ -9,15 +9,18 @@ using Book_Shelf.Services;
 
 namespace Book_Shelf.UI;
 
+/// <summary>Lets users select the application's theme and display language.</summary>
 public partial class ConfigurationWindow : Window {
     private bool isLoadingLanguage;
 
+    /// <summary>Initializes the configuration window and loads saved preferences when opened.</summary>
     public ConfigurationWindow()
     {
         InitializeComponent();
         Opened += OnOpened;
     }
 
+    /// <summary>Loads saved preferences and selects the configured language in the window.</summary>
     private async void OnOpened(object? sender, EventArgs e)
     {
         Opened -= OnOpened;
@@ -27,6 +30,7 @@ public partial class ConfigurationWindow : Window {
         isLoadingLanguage = false;
     }
 
+    /// <summary>Applies the theme variant selected by the user.</summary>
     private void Theme_OnClick(object? sender, RoutedEventArgs e)
     {
         if (sender == LightThemeRadioButton)
@@ -43,6 +47,7 @@ public partial class ConfigurationWindow : Window {
         }
     }
 
+    /// <summary>Saves the selected language and recreates the main window with updated strings.</summary>
     private async void Language_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
         if (isLoadingLanguage || LanguageComboBox.SelectedItem is not ComboBoxItem selectedItem)
@@ -60,6 +65,7 @@ public partial class ConfigurationWindow : Window {
         ReloadMainWindow();
     }
 
+    /// <summary>Selects the language option matching the saved language code.</summary>
     private void SetLanguageSelection(string? languageCode)
     {
         LanguageComboBox.SelectedIndex = languageCode switch
@@ -73,6 +79,7 @@ public partial class ConfigurationWindow : Window {
         };
     }
 
+    /// <summary>Replaces the main window so all static localized labels are refreshed.</summary>
     private void ReloadMainWindow()
     {
         if (Application.Current?.ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktop ||

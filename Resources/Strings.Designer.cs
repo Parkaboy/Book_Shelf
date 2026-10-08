@@ -52,6 +52,7 @@ public static class Strings
     public static string OrderByTitle => GetString(nameof(OrderByTitle));
     public static string OrderByAuthor => GetString(nameof(OrderByAuthor));
     public static string OrderByDateAdded => GetString(nameof(OrderByDateAdded));
+    public static string OrderByPageCount => GetString(nameof(OrderByPageCount));
     public static string Filter => GetString(nameof(Filter));
     public static string FilterAll => GetString(nameof(FilterAll));
     public static string FilterEpub => GetString(nameof(FilterEpub));

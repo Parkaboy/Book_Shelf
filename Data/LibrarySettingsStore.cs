@@ -7,10 +7,12 @@ using Book_Shelf.Models;
 
 namespace Book_Shelf.Data;
 
+/// <summary>Loads and saves user preferences in the local application data folder.</summary>
 public sealed class LibrarySettingsStore
 {
     private readonly string settingsPath;
 
+    /// <summary>Creates the settings store and ensures its parent directory exists.</summary>
     public LibrarySettingsStore()
     {
         var applicationDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
@@ -19,6 +21,7 @@ public sealed class LibrarySettingsStore
         settingsPath = Path.Combine(bookShelfPath, "settings.json");
     }
 
+    /// <summary>Asynchronously reads saved preferences or returns defaults if none exist.</summary>
     public async Task<LibrarySettings> LoadAsync(CancellationToken cancellationToken = default)
     {
         if (!File.Exists(settingsPath))
@@ -31,6 +34,7 @@ public sealed class LibrarySettingsStore
             ?? new LibrarySettings();
     }
 
+    /// <summary>Synchronously reads saved preferences or returns defaults if none exist.</summary>
     public LibrarySettings Load()
     {
         if (!File.Exists(settingsPath))
@@ -42,6 +46,7 @@ public sealed class LibrarySettingsStore
             ?? new LibrarySettings();
     }
 
+    /// <summary>Asynchronously persists the supplied user preferences.</summary>
     public async Task SaveAsync(LibrarySettings settings, CancellationToken cancellationToken = default)
     {
         await using var stream = File.Create(settingsPath);

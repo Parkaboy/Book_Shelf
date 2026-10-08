@@ -36,6 +36,7 @@
   <data name="OrderByTitle" xml:space="preserve"><value>Title</value></data>
   <data name="OrderByAuthor" xml:space="preserve"><value>Author</value></data>
   <data name="OrderByDateAdded" xml:space="preserve"><value>Date added</value></data>
+  <data name="OrderByPageCount" xml:space="preserve"><value>Number of pages</value></data>
   <data name="Filter" xml:space="preserve"><value>Filter</value></data>
   <data name="FilterAll" xml:space="preserve"><value>All formats</value></data>
   <data name="FilterEpub" xml:space="preserve"><value>EPUB</value></data>

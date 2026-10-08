@@ -5,13 +5,16 @@ using Book_Shelf.Resources;
 
 namespace Book_Shelf.UI;
 
+/// <summary>Displays application information and project links.</summary>
 public partial class AboutWindow : Window
 {
+    /// <summary>Initializes the application information window.</summary>
     public AboutWindow()
     {
         InitializeComponent();
     }
 
+    /// <summary>Opens the configured donation page in the default browser.</summary>
     private void BuyMeACoffee_OnClick(object? sender, RoutedEventArgs e)
     {
         Process.Start(new ProcessStartInfo
@@ -21,6 +24,7 @@ public partial class AboutWindow : Window
         });
     }
 
+    /// <summary>Closes the application information window.</summary>
     private void Close_OnClick(object? sender, RoutedEventArgs e)
     {
         Close();

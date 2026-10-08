@@ -6,10 +6,12 @@ using Book_Shelf.Models;
 
 namespace Book_Shelf.Services;
 
+/// <summary>Finds adjacent image files to use as a book's cover.</summary>
 public sealed class LocalBookCoverStrategy : IBookCoverStrategy
 {
     private static readonly string[] ImageExtensions = [".jpg", ".jpeg", ".png"];
 
+    /// <summary>Searches the book's directory for a matching or unambiguous local cover image.</summary>
     public async Task<string?> TryResolveAsync(
         Book book,
         string destinationPath,

@@ -8,12 +8,14 @@ using Serilog;
 
 namespace Book_Shelf.UI;
 
+/// <summary>Exposes a book record and cover image for binding in the library interface.</summary>
 public sealed class BookItemViewModel : INotifyPropertyChanged, IDisposable
 {
     private bool isSelected;
     private bool isEditing;
     private Bitmap? coverImage;
 
+    /// <summary>Creates a view model for a book and loads its cached cover if available.</summary>
     public BookItemViewModel(Book book)
     {
         Book = book;
@@ -79,8 +81,11 @@ public sealed class BookItemViewModel : INotifyPropertyChanged, IDisposable
 
             Book.PageCount = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(HasPageCount));
         }
     }
+
+    public bool HasPageCount => PageCount.HasValue;
 
     public string Format => Book.Format;
 
@@ -114,6 +119,7 @@ public sealed class BookItemViewModel : INotifyPropertyChanged, IDisposable
         }
     }
 
+    /// <summary>Reloads the cover image from the book's cached cover path.</summary>
     public void ReloadCoverImage()
     {
         CoverImage = null;
@@ -140,6 +146,7 @@ public sealed class BookItemViewModel : INotifyPropertyChanged, IDisposable
         }
     }
 
+    /// <summary>Releases the currently loaded cover bitmap.</summary>
     public void Dispose()
     {
         CoverImage = null;
@@ -147,9 +154,11 @@ public sealed class BookItemViewModel : INotifyPropertyChanged, IDisposable
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    /// <summary>Raises a property-changed notification for the specified or caller property.</summary>
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
+    /// <summary>Updates a backing field and notifies bindings when its value changes.</summary>
     private void SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
     {
         if (Equals(field, value))

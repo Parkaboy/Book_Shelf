@@ -10,15 +10,18 @@ using Book_Shelf.Models;
 
 namespace Book_Shelf.Services;
 
+/// <summary>Looks up book covers through the Google Books API.</summary>
 public sealed class GoogleBooksCoverStrategy : IBookCoverStrategy
 {
     private readonly HttpClient httpClient;
 
+    /// <summary>Creates the strategy with the HTTP client used for API and image requests.</summary>
     public GoogleBooksCoverStrategy(HttpClient httpClient)
     {
         this.httpClient = httpClient;
     }
 
+    /// <summary>Finds and downloads a matching cover image for a book.</summary>
     public async Task<string?> TryResolveAsync(
         Book book,
         string destinationPath,
@@ -78,6 +81,7 @@ public sealed class GoogleBooksCoverStrategy : IBookCoverStrategy
         }
     }
 
+    /// <summary>Builds an ISBN- or title-based Google Books search query.</summary>
     private static string? BuildQuery(Book book)
     {
         var isbn = NormalizeIsbn(book.Isbn);
@@ -97,6 +101,7 @@ public sealed class GoogleBooksCoverStrategy : IBookCoverStrategy
             : "intitle:" + title + " inauthor:" + book.Author.Trim();
     }
 
+    /// <summary>Normalizes a valid ISBN for use in a Google Books query.</summary>
     private static string? NormalizeIsbn(string? isbn)
     {
         if (string.IsNullOrWhiteSpace(isbn))
@@ -108,29 +113,34 @@ public sealed class GoogleBooksCoverStrategy : IBookCoverStrategy
         return normalized.Length is 10 or 13 ? normalized.ToUpperInvariant() : null;
     }
 
+    /// <summary>Upgrades insecure HTTP image URLs to HTTPS.</summary>
     private static string NormalizeImageUrl(string imageUrl) =>
         imageUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
             ? "https://" + imageUrl[7..]
             : imageUrl;
 
+    /// <summary>Represents the top-level response returned by Google Books.</summary>
     private sealed class GoogleBooksResponse
     {
         [JsonPropertyName("items")]
         public GoogleBookItem[]? Items { get; set; }
     }
 
+    /// <summary>Represents one book item in a Google Books response.</summary>
     private sealed class GoogleBookItem
     {
         [JsonPropertyName("volumeInfo")]
         public GoogleVolumeInfo? VolumeInfo { get; set; }
     }
 
+    /// <summary>Contains volume metadata relevant to locating a cover.</summary>
     private sealed class GoogleVolumeInfo
     {
         [JsonPropertyName("imageLinks")]
         public GoogleImageLinks? ImageLinks { get; set; }
     }
 
+    /// <summary>Contains the available cover image URLs for a volume.</summary>
     private sealed class GoogleImageLinks
     {
         [JsonPropertyName("extraLarge")]
@@ -148,6 +158,7 @@ public sealed class GoogleBooksCoverStrategy : IBookCoverStrategy
         [JsonPropertyName("smallThumbnail")]
         public string? SmallThumbnail { get; set; }
 
+        /// <summary>Returns the largest available cover image URL.</summary>
         public string? SelectBest() => ExtraLarge ?? Large ?? Medium ?? Thumbnail ?? SmallThumbnail;
     }
 }

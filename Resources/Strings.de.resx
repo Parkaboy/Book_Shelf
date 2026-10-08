@@ -34,6 +34,7 @@
   <data name="OrderByTitle"><value>Titel</value></data>
   <data name="OrderByAuthor"><value>Autor</value></data>
   <data name="OrderByDateAdded"><value>Hinzugefügt am</value></data>
+  <data name="OrderByPageCount"><value>Seitenzahl</value></data>
   <data name="Filter"><value>Filter</value></data>
   <data name="FilterAll"><value>Alle Formate</value></data>
   <data name="FilterEpub"><value>EPUB</value></data>
