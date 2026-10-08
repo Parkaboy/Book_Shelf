@@ -68,7 +68,42 @@
         </Style>
     </Window.Styles>
 
-    <DockPanel Background="{DynamicResource LibraryBackgroundColor}">
+    <Grid Background="{DynamicResource LibraryBackgroundColor}">
+        <Border x:Name="SplashScreen" Background="{DynamicResource LibraryBackgroundColor}">
+            <StackPanel HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Spacing="20">
+                <Border Width="64"
+                        Height="64"
+                        CornerRadius="14"
+                        Background="#284B63"
+                        HorizontalAlignment="Center">
+                    <TextBlock Text="B"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               FontSize="36"
+                               FontWeight="Bold"
+                               Foreground="White" />
+                </Border>
+                <StackPanel Spacing="8">
+                    <TextBlock Text="{x:Static resources:Strings.BookShelf}"
+                               HorizontalAlignment="Center"
+                               FontSize="30"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource LibraryTextColor}" />
+                    <TextBlock Text="{x:Static resources:Strings.LoadingLibrary}"
+                               HorizontalAlignment="Center"
+                               Classes="label" />
+                </StackPanel>
+                <ProgressBar Width="240"
+                             Height="4"
+                             IsIndeterminate="True" />
+            </StackPanel>
+        </Border>
+
+    <DockPanel x:Name="LibraryContent"
+               IsVisible="False"
+               Background="{DynamicResource LibraryBackgroundColor}">
         <Menu DockPanel.Dock="Top"
               Background="{DynamicResource LibrarySurfaceColor}"
               automation:AutomationProperties.LandmarkType="Navigation">
@@ -193,4 +228,5 @@
             </ScrollViewer>
         </Grid>
     </DockPanel>
+    </Grid>
 </Window>

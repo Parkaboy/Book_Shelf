@@ -28,6 +28,7 @@ public partial class MainWindow : Window
     private async void OnOpened(object? sender, EventArgs e)
     {
         Opened -= OnOpened;
+        await Task.Yield();
         try
         {
             await viewModel.InitializeAsync();
@@ -36,6 +37,11 @@ public partial class MainWindow : Window
         {
             Log.Error(exception, "Failed to initialize the library");
             viewModel.SetStatusMessage(Strings.LibraryInitializationFailed);
+        }
+        finally
+        {
+            SplashScreen.IsVisible = false;
+            LibraryContent.IsVisible = true;
         }
     }
 

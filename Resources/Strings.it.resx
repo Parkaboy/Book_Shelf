@@ -29,6 +29,7 @@
   <data name="LibraryIsUpToDate"><value>La raccolta è aggiornata.</value></data>
   <data name="LibraryIsUpToDateWithCount"><value>La raccolta è aggiornata. Numero di libri: {0}</value></data>
   <data name="LibraryUpdatedFormat"><value>Raccolta aggiornata: {0} modifica/e.</value></data>
+  <data name="LoadingLibrary"><value>Caricamento della raccolta...</value></data>
   <data name="OrderBy"><value>Ordina per</value></data>
   <data name="OrderByTitle"><value>Titolo</value></data>
   <data name="OrderByAuthor"><value>Autore</value></data>

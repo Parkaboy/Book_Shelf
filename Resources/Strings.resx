@@ -31,6 +31,7 @@
   <data name="LibraryIsUpToDate" xml:space="preserve"><value>Library is up to date.</value></data>
   <data name="LibraryIsUpToDateWithCount" xml:space="preserve"><value>Library is up to date. Number of books: {0}</value></data>
   <data name="LibraryUpdatedFormat" xml:space="preserve"><value>Library updated: {0} change(s).</value></data>
+  <data name="LoadingLibrary" xml:space="preserve"><value>Loading your library...</value></data>
   <data name="OrderBy" xml:space="preserve"><value>Order by</value></data>
   <data name="OrderByTitle" xml:space="preserve"><value>Title</value></data>
   <data name="OrderByAuthor" xml:space="preserve"><value>Author</value></data>

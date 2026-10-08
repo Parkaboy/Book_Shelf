@@ -29,6 +29,7 @@
   <data name="LibraryIsUpToDate"><value>Die Bibliothek ist aktuell.</value></data>
   <data name="LibraryIsUpToDateWithCount"><value>Die Bibliothek ist aktuell. Anzahl der Bücher: {0}</value></data>
   <data name="LibraryUpdatedFormat"><value>Bibliothek aktualisiert: {0} Änderung(en).</value></data>
+  <data name="LoadingLibrary"><value>Ihre Bibliothek wird geladen...</value></data>
   <data name="OrderBy"><value>Sortieren nach</value></data>
   <data name="OrderByTitle"><value>Titel</value></data>
   <data name="OrderByAuthor"><value>Autor</value></data>

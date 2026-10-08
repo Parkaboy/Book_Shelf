@@ -47,6 +47,7 @@ public static class Strings
     public static string LibraryIsUpToDate => GetString(nameof(LibraryIsUpToDate));
     public static string LibraryIsUpToDateWithCount => GetString(nameof(LibraryIsUpToDateWithCount));
     public static string LibraryUpdatedFormat => GetString(nameof(LibraryUpdatedFormat));
+    public static string LoadingLibrary => GetString(nameof(LoadingLibrary));
     public static string OrderBy => GetString(nameof(OrderBy));
     public static string OrderByTitle => GetString(nameof(OrderByTitle));
     public static string OrderByAuthor => GetString(nameof(OrderByAuthor));
