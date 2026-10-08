@@ -9,6 +9,7 @@
         x:Class="Book_Shelf.MainWindow"
         XYFocus.NavigationModes="Keyboard"
         x:DataType="vm:LibraryViewModel"
+        Icon="/Assets/bookshelf.ico"
         Title="{x:Static resources:Strings.BookShelf}"
         MinWidth="900"
         MinHeight="600">
@@ -73,18 +74,10 @@
             <StackPanel HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         Spacing="20">
-                <Border Width="64"
-                        Height="64"
-                        CornerRadius="14"
-                        Background="#284B63"
-                        HorizontalAlignment="Center">
-                    <TextBlock Text="B"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center"
-                               FontSize="36"
-                               FontWeight="Bold"
-                               Foreground="White" />
-                </Border>
+                <Image Source="/Assets/bookshelf.png"
+                       Width="64"
+                       Height="64"
+                       Stretch="Uniform" />
                 <StackPanel Spacing="8">
                     <TextBlock Text="{x:Static resources:Strings.BookShelf}"
                                HorizontalAlignment="Center"
