@@ -14,6 +14,7 @@ namespace Book_Shelf.Services;
 public sealed class GoogleBooksCoverStrategy : IBookCoverStrategy
 {
     private readonly HttpClient httpClient;
+    private int isUnavailable;
 
     /// <summary>Creates the strategy with the HTTP client used for API and image requests.</summary>
     public GoogleBooksCoverStrategy(HttpClient httpClient)
@@ -27,72 +28,88 @@ public sealed class GoogleBooksCoverStrategy : IBookCoverStrategy
         string destinationPath,
         CancellationToken cancellationToken = default)
     {
-        var query = BuildQuery(book);
-        if (query is null)
-        {
+        /* 
+         Checks whether an earlier Google request failed due to a connection problem or timeout.
+         This is useful in case we don't have Internet connection or Google books is unreacheable, 
+         so we don't spned time querying for covers.
+        */
+        if (Volatile.Read(ref isUnavailable) != 0) {
+        
             return null;
         }
 
-        try
-        {
+        var query = BuildQuery(book);
+        if (query is null) {
+        
+            return null;
+        }
+
+        try {
             var requestUri = "https://www.googleapis.com/books/v1/volumes?q=" + Uri.EscapeDataString(query) + "&maxResults=1";
             var response = await httpClient.GetFromJsonAsync<GoogleBooksResponse>(requestUri, cancellationToken);
             var imageUrl = response?.Items?.FirstOrDefault()?.VolumeInfo?.ImageLinks?.SelectBest();
-            if (string.IsNullOrWhiteSpace(imageUrl))
-            {
+            
+            if (string.IsNullOrWhiteSpace(imageUrl)) {
+
                 return null;
             }
 
             using var imageResponse = await httpClient.GetAsync(NormalizeImageUrl(imageUrl), cancellationToken);
             imageResponse.EnsureSuccessStatusCode();
+
             var temporaryPath = destinationPath + ".tmp";
-            try
-            {
+
+            try {
                 await using (var source = await imageResponse.Content.ReadAsStreamAsync(cancellationToken))
-                await using (var destination = System.IO.File.Create(temporaryPath))
-                {
+
+                await using (var destination = System.IO.File.Create(temporaryPath)) {
+
                     await source.CopyToAsync(destination, cancellationToken);
                 }
 
                 System.IO.File.Move(temporaryPath, destinationPath, overwrite: true);
                 return destinationPath;
             }
-            catch
-            {
-                if (System.IO.File.Exists(temporaryPath))
-                {
+            catch {
+                if (System.IO.File.Exists(temporaryPath)) {
                     System.IO.File.Delete(temporaryPath);
                 }
 
                 throw;
             }
         }
-        catch (HttpRequestException)
-        {
+        catch (HttpRequestException exception) when (exception.StatusCode is null) {
+
+            Interlocked.Exchange(ref isUnavailable, 1);
             return null;
         }
-        catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested)
-        {
+        catch (HttpRequestException) {
+
             return null;
         }
-        catch (JsonException)
-        {
+        catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested) {
+
+            Interlocked.Exchange(ref isUnavailable, 1);
+            return null;
+        }
+        catch (JsonException) {
             return null;
         }
     }
 
     /// <summary>Builds an ISBN- or title-based Google Books search query.</summary>
-    private static string? BuildQuery(Book book)
-    {
+    private static string? BuildQuery(Book book) {
         var isbn = NormalizeIsbn(book.Isbn);
-        if (!string.IsNullOrWhiteSpace(isbn))
-        {
+
+        if (!string.IsNullOrWhiteSpace(isbn)) {
+
             return "isbn:" + isbn;
         }
 
         var title = book.Title.Trim();
-        if (title.Length == 0)
-        {
+
+        if (title.Length == 0) {
+
             return null;
         }
 
@@ -102,10 +119,9 @@ public sealed class GoogleBooksCoverStrategy : IBookCoverStrategy
     }
 
     /// <summary>Normalizes a valid ISBN for use in a Google Books query.</summary>
-    private static string? NormalizeIsbn(string? isbn)
-    {
-        if (string.IsNullOrWhiteSpace(isbn))
-        {
+    private static string? NormalizeIsbn(string? isbn) {
+        if (string.IsNullOrWhiteSpace(isbn)) {
+
             return null;
         }
 
